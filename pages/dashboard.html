@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Green Shadow - Dashboard</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+  </head>
+  <body>
+    <div class="dashboard">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="logo">
+          <h1>Green Shadow</h1>
+        </div>
+        <nav>
+          <ul>
+            <li>
+              <a href="#"><i class="fas fa-home"></i> Dashboard</a>
+            </li>
+            <li>
+              <a href="#"><i class="fas fa-leaf"></i> Crops</a>
+            </li>
+            <li>
+              <a href="#"><i class="fas fa-map-marker-alt"></i> Fields</a>
+            </li>
+            <li>
+              <a href="#"><i class="fas fa-user"></i> Staff</a>
+            </li>
+            <li>
+              <a href="#"><i class="fas fa-users"></i> Users</a>
+            </li>
+            <li>
+              <a href="#"><i class="fas fa-tools"></i> Equipment</a>
+            </li>
+            <li>
+              <a href="#"><i class="fas fa-truck"></i> Vehicles</a>
+            </li>
+            <li>
+              <a href="#"><i class="fas fa-clipboard-list"></i> Monitor Logs</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="logout">
+          <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <header>
+          <div class="greeting">
+            <h2>Welcome, User</h2>
+            <p>Today is <span id="date"></span></p>
+          </div>
+          <input type="text" placeholder="Search..." />
+        </header>
+
+        <section class="overview">
+          <div class="card">
+            <i class="fas fa-leaf"></i>
+            <p>Active: 10</p>
+          </div>
+          <div class="card">
+            <i class="fas fa-map-marker-alt"></i>
+            <p>Monitored: 25</p>
+          </div>
+          <div class="card">
+            <i class="fas fa-user"></i>
+            <p>Available: 8</p>
+          </div>
+          <div class="card">
+            <i class="fas fa-tools"></i>
+            <p>Operational: 12</p>
+          </div>
+        </section>
+
+        <section class="live-location">
+          <h3>Live Location</h3>
+          <div class="map">
+            <!-- Embed a map here -->
+            <p>Map Placeholder</p>
+          </div>
+        </section>
+
+        <section class="weather-tasks">
+          <div class="weather">
+            <h3>Weather Info</h3>
+            <p>Temperature: 26°C</p>
+            <p>Cloudy</p>
+          </div>
+          <div class="tasks">
+            <h3>Tasks</h3>
+            <ul>
+              <li>Visit Field A - 9:00 AM</li>
+              <li>Inspect Crop B - 10:30 AM</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>

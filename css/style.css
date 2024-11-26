@@ -1,9 +1,16 @@
 /* Full-page background image */
 body {
-    background-image: url('../assets/pexels-bobby-mc-gee-lee-77973442-16762584-fields.jpg') no-repeat center center fixed;
     background-size: cover;
     margin: 0;
     font-family: Arial, sans-serif;
+}
+.background_image img{
+    background: url('./assets/pexels-bobby-mc-gee-lee-77973442-16762584-fields.jpg') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh; /* Full viewport height */
+    width: 100%; /* Full viewport width */
+    position: relative;
+    object-fit: cover;    
 }
 
 /* Login container styles */
