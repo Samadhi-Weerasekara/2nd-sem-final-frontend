@@ -1,0 +1,90 @@
+/* Full-page background image */
+body {
+    background-image: url('../assets/pexels-bobby-mc-gee-lee-77973442-16762584-fields.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Login container styles */
+.login-container {
+    background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white background */
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 90%;
+    margin: auto;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.login-header h1 {
+    color: #558b2f;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.login-header p {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.login-form .form-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.login-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.form-options a {
+    color: #558b2f;
+    text-decoration: none;
+}
+
+.form-options a:hover {
+    text-decoration: underline;
+}
+
+.btn {
+    background: #558b2f;
+    color: #fff;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #33691e;
+}
+
+footer {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #777;
+}
