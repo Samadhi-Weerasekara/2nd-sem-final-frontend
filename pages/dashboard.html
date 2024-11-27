@@ -23,97 +23,57 @@
     <link rel="stylesheet" href="/css/dashboard.css" />
   </head>
   <body>
-    <div class="dashboard">
-      <!-- Sidebar -->
-      <div class="sidebar">
-        <div class="logo">
-          <h1>Green Shadow</h1>
+    <!-- Main Content -->
+    <div class="main-content">
+      <header>
+        <div class="greeting">
+          <h2>Welcome, User</h2>
+          <p>Today is <span id="date"></span></p>
         </div>
-        <nav>
+        <input type="text" placeholder="Search..." />
+      </header>
+
+      <section class="overview">
+        <div class="card">
+          <i class="fas fa-leaf"></i>
+          <p>Active: 10</p>
+        </div>
+        <div class="card">
+          <i class="fas fa-map-marker-alt"></i>
+          <p>Monitored: 25</p>
+        </div>
+        <div class="card">
+          <i class="fas fa-user"></i>
+          <p>Available: 8</p>
+        </div>
+        <div class="card">
+          <i class="fas fa-tools"></i>
+          <p>Operational: 12</p>
+        </div>
+      </section>
+
+      <section class="live-location">
+        <h3>Live Location</h3>
+        <div class="map">
+          <!-- Embed a map here -->
+          <p>Map Placeholder</p>
+        </div>
+      </section>
+
+      <section class="weather-tasks">
+        <div class="weather">
+          <h3>Weather Info</h3>
+          <p>Temperature: 26°C</p>
+          <p>Cloudy</p>
+        </div>
+        <div class="tasks">
+          <h3>Tasks</h3>
           <ul>
-            <li>
-              <a href="#"><i class="fas fa-home"></i> Dashboard</a>
-            </li>
-            <li>
-              <a href="#"><i class="fas fa-leaf"></i> Crops</a>
-            </li>
-            <li>
-              <a href="#"><i class="fas fa-map-marker-alt"></i> Fields</a>
-            </li>
-            <li>
-              <a href="#"><i class="fas fa-user"></i> Staff</a>
-            </li>
-            <li>
-              <a href="#"><i class="fas fa-users"></i> Users</a>
-            </li>
-            <li>
-              <a href="#"><i class="fas fa-tools"></i> Equipment</a>
-            </li>
-            <li>
-              <a href="#"><i class="fas fa-truck"></i> Vehicles</a>
-            </li>
-            <li>
-              <a href="#"><i class="fas fa-clipboard-list"></i> Monitor Logs</a>
-            </li>
+            <li>Visit Field A - 9:00 AM</li>
+            <li>Inspect Crop B - 10:30 AM</li>
           </ul>
-        </nav>
-        <div class="logout">
-          <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
-      </div>
-
-      <!-- Main Content -->
-      <div class="main-content">
-        <header>
-          <div class="greeting">
-            <h2>Welcome, User</h2>
-            <p>Today is <span id="date"></span></p>
-          </div>
-          <input type="text" placeholder="Search..." />
-        </header>
-
-        <section class="overview">
-          <div class="card">
-            <i class="fas fa-leaf"></i>
-            <p>Active: 10</p>
-          </div>
-          <div class="card">
-            <i class="fas fa-map-marker-alt"></i>
-            <p>Monitored: 25</p>
-          </div>
-          <div class="card">
-            <i class="fas fa-user"></i>
-            <p>Available: 8</p>
-          </div>
-          <div class="card">
-            <i class="fas fa-tools"></i>
-            <p>Operational: 12</p>
-          </div>
-        </section>
-
-        <section class="live-location">
-          <h3>Live Location</h3>
-          <div class="map">
-            <!-- Embed a map here -->
-            <p>Map Placeholder</p>
-          </div>
-        </section>
-
-        <section class="weather-tasks">
-          <div class="weather">
-            <h3>Weather Info</h3>
-            <p>Temperature: 26°C</p>
-            <p>Cloudy</p>
-          </div>
-          <div class="tasks">
-            <h3>Tasks</h3>
-            <ul>
-              <li>Visit Field A - 9:00 AM</li>
-              <li>Inspect Crop B - 10:30 AM</li>
-            </ul>
-          </div>
-        </section>
-      </div>
+      </section>
     </div>
   </body>
 </html>

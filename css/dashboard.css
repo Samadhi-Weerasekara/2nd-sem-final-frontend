@@ -3,60 +3,9 @@ body{
   font-family: "Kanit", sans-serif;
  
 }
-.sidebar {
-    width: 250px;
-    background-color: #132306;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    padding: 20px 0;
-    position: fixed;
-    height: 100%;
-  }
-  
-  .sidebar .logo h1 {
-    font-size: 24px;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .sidebar nav ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .sidebar nav ul li {
-    margin-bottom: 10px;
-  }
-  
-  .sidebar nav ul li a {
-    text-decoration: none;
-    color: #fff;
-    padding: 10px 20px;
-    display: block;
-    transition: background-color 0.3s;
-  }
-  
-  .sidebar nav ul li a:hover {
-    background-color: #264653;
-    border-radius: 5px;
-  }
-  
-  
-  .sidebar .logout {
-    margin-top: auto;
-    text-align: center;
-  }
-  
-  .sidebar .logout a {
-    text-decoration: none;
-    color: #fff;
-    font-weight: bold;
-  }
-  
+
   /* Main Content */
   .main-content {
-    margin-left: 250px;
     padding: 20px;
     background-color: #f5f5f5;
     min-height: 100vh;
