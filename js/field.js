@@ -47,8 +47,8 @@ function generateRowHTML(fieldId, fieldName, fieldLocation, fieldExtent, fieldIm
     <td><img src="${fieldImage1}" alt="Image 1" style="width: 100px; height: auto;"></td>
     <td><img src="${fieldImage2}" alt="Image 2" style="width: 100px; height: auto;"></td>
     <td>
-      <button class="btn btn-warning btn-sm" onclick="editField('${fieldId}')">Edit</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteField('${fieldId}')">Delete</button>
+      <button class="btn  btn-sm" onclick="editField('${fieldId}')"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn  btn-sm" onclick="deleteField('${fieldId}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></button>
     </td>
   `;
 }

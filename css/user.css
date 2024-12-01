@@ -1,0 +1,130 @@
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+}
+h1,h2{
+    font-family: "Kanit", sans-serif;
+    padding: 15px;
+}
+.user-management {
+  padding: 30px;
+}
+
+header {
+  color: #436850;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.container {
+  display: flex;
+  margin-top: 20px;
+}
+
+.left-column {
+  flex: 2;
+  padding: 20px;
+  margin-right: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.row1{
+  display: inline;
+  display: flex;
+  align-items: center;
+}
+
+.right-column {
+  flex: 1;
+  padding: 30px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+button {
+  border: none;
+  background-color: #ffff;
+}
+.add-user{
+  border-radius: 10px;
+  background-color: #436850;
+  color: #ffff;
+  border: none;
+  padding: 8px;
+  margin-top: 10px;
+}
+.search-bar {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="email"],
+select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+  flex: 1;
+}
+
+.search-button,
+.add-user,
+.update-user {
+}
+
+.search-button:hover,
+.add-user:hover,
+.update-user:hover {
+  background-color: #436850;
+}
+
+.user-list {
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  
+}
+
+.manager-details {
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #e9ecef;
+}
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.user-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+.user-text-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.user-text-details p {
+  margin: 0;
+}
+

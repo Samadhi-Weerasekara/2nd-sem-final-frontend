@@ -9,54 +9,69 @@ body {
 }
 .sidebar {
   /* width: 250px; */
-  background-color: #4F6F52;
-  color: black;
+  background-color: #12372A;
+  color: #ADBC9F;
   display: flex;
   flex-direction: column;
-  padding: 20px 0;
+  padding: 10px 0;
   padding-left: 10px;
   /* position: fixed; */
   height: 100%;
 }
 
 .sidebar .logo h1 {
-  font-size: 24px;
+  font-size: 20px;
   text-align: center;
   margin-bottom: 20px;
+  padding: 0;
+  font-weight: bolder;
 }
 
 .sidebar nav ul {
   list-style: none;
   padding: 0;
+  font-weight: bolder;
 }
 
 .sidebar nav ul li {
-  margin: 10px;
+  margin: 5px;
+  padding: 0px 8px ;
+
 
 }
 
 .sidebar nav ul li a {
   text-decoration: none;
   color: rgb(180, 176, 176);
+  font-weight: bold;
   padding: 10px 20px;
   display: block;
-  font-size: 1.2rem;
+  font-size: 1rem;
   transition: background-color 0.3s;
-  font-weight: 400;
+  border-radius: 5px;
+ 
 }
 
 .sidebar nav ul li a:hover {
-  background-color: #85A98F;
+  background-color: #FBFADA;
   border-radius: 5px;
+  color: #12372A;
+  font-weight: bold;
 }
 
 .sidebar .logout {
   margin-top: auto;
   text-align: center;
+ 
 }
 
 .sidebar .logout a {
   text-decoration: none;
-  color: #fff;
+  color: rgb(180, 176, 176);
   font-weight: bold;
+}
+.logo img {
+  max-width: 80px;
+  /* height: auto; */
+  margin-top: 0;
 }

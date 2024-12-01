@@ -1,5 +1,33 @@
 let editingCropCode = null; // Track the crop being edited
-
+let crops = [
+  {
+    cropCode: "CROP-1001",
+    cropCommonName: "Rice",
+    cropScientificName: "Oryza sativa",
+    cropCategory: "Cereal",
+    cropSeason: "Summer",
+    cropField: "Field A",
+    cropImage: "assets/rice.jpg"
+  },
+  {
+    cropCode: "CROP-1002",
+    cropCommonName: "Wheat",
+    cropScientificName: "Triticum aestivum",
+    cropCategory: "Cereal",
+    cropSeason: "Winter",
+    cropField: "Field B",
+    cropImage: "assets/wheat.jpg"
+  },
+  {
+    cropCode: "CROP-1003",
+    cropCommonName: "Corn",
+    cropScientificName: "Zea mays",
+    cropCategory: "Cereal",
+    cropSeason: "Summer",
+    cropField: "Field C",
+    cropImage: "assets/corn.jpg"
+  }
+]
 // Add Event Listener to the Form
 document.getElementById("cropForm").addEventListener("submit", (event) => {
   event.preventDefault();
@@ -62,8 +90,8 @@ function generateRowHTML(cropCode, commonName, scientificName, category, season,
     <td>${field}</td>
     <td><img src="${image}" alt="Crop Image" style="width: 100px; height: auto;"></td>
     <td>
-      <button class="btn btn-warning btn-sm" onclick="editCrop('${cropCode}')">Edit</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteCrop('${cropCode}')">Delete</button>
+      <button class="btn  btn-sm" onclick="editCrop('${cropCode}')"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn  btn-sm" onclick="deleteCrop('${cropCode}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></button>
     </td>
   `;
 }
