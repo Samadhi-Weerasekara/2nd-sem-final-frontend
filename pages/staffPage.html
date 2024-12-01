@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Staff Management</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/staff.css" />
+  </head>
+  <body>
+    <div class="main-container mt-5">
+      <!-- Search Input -->
+      <div class="d-flex justify-content-between mb-4">
+        <input
+          type="text"
+          id="searchStaff"
+          class="form-control"
+          placeholder="Search Staff by Name"
+          oninput="searchStaff()"
+        />
+      </div>
+
+      <!-- Header Section -->
+      <div class="d-flex justify-content-between mb-4">
+        <h1>Staff Management</h1>
+        <button
+          id="addStaffBtn"
+          data-bs-toggle="modal"
+          data-bs-target="#staffModal"
+          onclick="openAddStaffModal()"
+        >
+          <i class="fas fa-plus"></i> Add Staff
+        </button>
+      </div>
+
+      <!-- Table for Staff List -->
+      <table class="table table-striped" id="staffTable" >
+        <thead>
+          <tr style="font-size: small;">
+            <th>Staff ID</th>
+            <th>Full Name</th>
+            <th>Designation</th>
+            <th>Gender</th>
+            <th>Joined Date</th>
+            <th>Email</th>
+            <th>Contact</th>
+            <th>Address</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="staffTableBody" style="font-size: smaller;">
+          <!-- Dynamic rows will be inserted here -->
+        </tbody>
+      </table>
+
+      <!-- Add/Edit Staff Modal -->
+      <div
+        class="modal fade"
+        id="staffModal"
+        tabindex="-1"
+        aria-labelledby="staffModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staffModalLabel">Add/Edit Staff</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="staffForm">
+                <input type="hidden" id="staffId" />
+                <!-- Hidden Field for ID -->
+
+                <!-- Basic Details -->
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="firstName"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="lastName"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="designation" class="form-label"
+                      >Designation</label
+                    >
+                    <select class="form-select" id="designation" required>
+                      <option value="">Select Designation</option>
+                      <option value="Manager">Manager</option>
+                      <option value="Scientist">Scientist</option>
+                      <option value="Administrative">Administrative</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select class="form-select" id="gender" required>
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="joinedDate" class="form-label"
+                      >Joined Date</label
+                    >
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="joinedDate"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="role" class="form-label">Role</label>
+                    <select class="form-select" id="role" required>
+                      <option value="">Select Role</option>
+                      <option value="Admin">Admin</option>
+                      <option value="User">User</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Email and Contact -->
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                    <label for="mobilePhone" class="form-label">Mobile Number</label>
+                    <input 
+                      type="tel" 
+                      id="mobilePhone" 
+                      class="form-control" 
+                      placeholder="07xxxxxxxx" 
+                      pattern="07[0-9]{8}" 
+                      title="Enter a valid mobile number (e.g., 0712345678)" 
+                      maxlength="10" 
+                      required 
+                    />
+                </div>
+
+                <!-- Address Fields -->
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="addressLine1" class="form-label"
+                      >Address Line 1</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="addressLine1"
+                      required
+                      placeholder="Building no or name"
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="addressLine2" class="form-label"
+                      >Address Line 2</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="addressLine2"
+                      required
+                      placeholder="Lane"
+                    />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="addressLine3" class="form-label"
+                      >Address Line 3</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="addressLine3"
+                      required
+                      placeholder="City"
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="addressLine4" class="form-label"
+                      >Address Line 4</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="addressLine4"
+                      required
+                      placeholder="State"
+                    />
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="addressLine5" class="form-label"
+                    >Address Line 5</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="addressLine5"
+                    required
+                    placeholder="Postal Code"
+                  />
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                  Save Staff
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/staff.js"></script>
+  </body>
+</html>

@@ -9,8 +9,8 @@ body {
 }
 .sidebar {
   /* width: 250px; */
-  background-color: #132306;
-  color: #fff;
+  background-color: #4F6F52;
+  color: black;
   display: flex;
   flex-direction: column;
   padding: 20px 0;
@@ -31,19 +31,22 @@ body {
 }
 
 .sidebar nav ul li {
-  margin-bottom: 10px;
+  margin: 10px;
+
 }
 
 .sidebar nav ul li a {
   text-decoration: none;
-  color: #fff;
+  color: rgb(180, 176, 176);
   padding: 10px 20px;
   display: block;
+  font-size: 1.2rem;
   transition: background-color 0.3s;
+  font-weight: 400;
 }
 
 .sidebar nav ul li a:hover {
-  background-color: #264653;
+  background-color: #85A98F;
   border-radius: 5px;
 }
 

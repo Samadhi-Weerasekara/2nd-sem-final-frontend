@@ -1,0 +1,10 @@
+.main-container{
+    padding: 25px;
+}
+#addStaffBtn{
+    border-radius: 10px;
+    background-color: #739072;
+    color: #ffff;
+    border: none;
+    
+}
