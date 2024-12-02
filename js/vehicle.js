@@ -1,29 +1,46 @@
-// Mock data storage
+// Sample array to store vehicle data
 let vehicles = [];
-let vehicleCounter = 1;
 
-// Generate a new vehicle code
-function generateVehicleCode() {
-  const code = `VEH-${String(vehicleCounter).padStart(4, "0")}`;
-  vehicleCounter++;
-  return code;
+// Function to display vehicles in the table
+function populateTable() {
+  const tableBody = document.getElementById("vehicleTableBody");
+  tableBody.innerHTML = ""; // Clear the table
+
+  vehicles.forEach((vehicle, index) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${vehicle.code}</td>
+      <td>${vehicle.licensePlate}</td>
+      <td>${vehicle.category}</td>
+      <td>${vehicle.fuelType}</td>
+      <td>${vehicle.status}</td>
+      <td>${vehicle.assignedStaff}</td>
+      <td>${vehicle.remarks}</td>
+      <td>
+        <button class="btn btn-sm btn-warning" onclick="editVehicle(${index})">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteVehicle(${index})">Delete</button>
+      </td>
+    `;
+
+    tableBody.appendChild(row);
+  });
 }
 
-// Add or update vehicle
-document.getElementById("vehicleForm").addEventListener("submit", function (event) {
+// Function to add or edit a vehicle
+function saveVehicle(event) {
   event.preventDefault();
 
   const vehicleId = document.getElementById("vehicleId").value;
-  const vehicleCode = document.getElementById("vehicleCode").value;
-  const licensePlate = document.getElementById("licensePlate").value.trim();
+  const licensePlate = document.getElementById("licensePlate").value;
   const category = document.getElementById("vehicleCategory").value;
   const fuelType = document.getElementById("fuelType").value;
   const status = document.getElementById("status").value;
-  const assignedStaff = document.getElementById("assignedStaff").value.trim();
-  const remarks = document.getElementById("remarks").value.trim();
+  const assignedStaff = document.getElementById("assignedStaff").value;
+  const remarks = document.getElementById("remarks").value;
 
-  const newVehicle = {
-    vehicleCode,
+  const vehicle = {
+    code: vehicleId || V${Date.now()}, // Generate a unique code if not editing
     licensePlate,
     category,
     fuelType,
@@ -33,63 +50,39 @@ document.getElementById("vehicleForm").addEventListener("submit", function (even
   };
 
   if (vehicleId) {
-    // Update vehicle
-    const index = vehicles.findIndex((v) => v.vehicleCode === vehicleId);
-    vehicles[index] = newVehicle;
+    // Edit existing vehicle
+    const index = vehicles.findIndex((v) => v.code === vehicleId);
+    vehicles[index] = vehicle;
   } else {
     // Add new vehicle
-    newVehicle.vehicleCode = generateVehicleCode();
-    vehicles.push(newVehicle);
+    vehicles.push(vehicle);
   }
 
-  refreshTable();
-  clearForm();
-  bootstrap.Modal.getInstance(document.getElementById("vehicleModal")).hide();
-});
+  // Close the modal
+  const modal = bootstrap.Modal.getInstance(document.getElementById("vehicleModal"));
+  modal.hide();
 
-// Refresh table
-function refreshTable() {
-  const tableBody = document.getElementById("vehicleTableBody");
-  tableBody.innerHTML = "";
-
-  vehicles.forEach((vehicle) => {
-    const row = `
-      <tr>
-        <td>${vehicle.vehicleCode}</td>
-        <td>${vehicle.licensePlate}</td>
-        <td>${vehicle.category}</td>
-        <td>${vehicle.fuelType}</td>
-        <td>${vehicle.status}</td>
-        <td>${vehicle.assignedStaff}</td>
-        <td>${vehicle.remarks}</td>
-        <td>
-          <button class="btn btn-sm btn-warning" onclick="editVehicle('${vehicle.vehicleCode}')">Edit</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteVehicle('${vehicle.vehicleCode}')">Delete</button>
-        </td>
-      </tr>
-    `;
-    tableBody.insertAdjacentHTML("beforeend", row);
-  });
-}
-
-// Clear form
-function clearForm() {
+  // Reset the form
+  document.getElementById("vehicleForm").reset();
   document.getElementById("vehicleId").value = "";
-  document.getElementById("vehicleCode").value = generateVehicleCode();
-  document.getElementById("licensePlate").value = "";
-  document.getElementById("vehicleCategory").value = "";
-  document.getElementById("fuelType").value = "";
-  document.getElementById("status").value = "";
-  document.getElementById("assignedStaff").value = "";
-  document.getElementById("remarks").value = "";
+
+  // Update the table
+  populateTable();
 }
 
-// Edit vehicle
-function editVehicle(vehicleCode) {
-  const vehicle = vehicles.find((v) => v.vehicleCode === vehicleCode);
+// Function to delete a vehicle
+function deleteVehicle(index) {
+  if (confirm("Are you sure you want to delete this vehicle?")) {
+    vehicles.splice(index, 1);
+    populateTable();
+  }
+}
 
-  document.getElementById("vehicleId").value = vehicle.vehicleCode;
-  document.getElementById("vehicleCode").value = vehicle.vehicleCode;
+// Function to edit a vehicle
+function editVehicle(index) {
+  const vehicle = vehicles[index];
+
+  document.getElementById("vehicleId").value = vehicle.code;
   document.getElementById("licensePlate").value = vehicle.licensePlate;
   document.getElementById("vehicleCategory").value = vehicle.category;
   document.getElementById("fuelType").value = vehicle.fuelType;
@@ -97,17 +90,43 @@ function editVehicle(vehicleCode) {
   document.getElementById("assignedStaff").value = vehicle.assignedStaff;
   document.getElementById("remarks").value = vehicle.remarks;
 
-  const vehicleModal = new bootstrap.Modal(document.getElementById("vehicleModal"));
-  vehicleModal.show();
+  // Show the modal
+  const modal = new bootstrap.Modal(document.getElementById("vehicleModal"));
+  modal.show();
 }
 
-// Delete vehicle
-function deleteVehicle(vehicleCode) {
-  vehicles = vehicles.filter((v) => v.vehicleCode !== vehicleCode);
-  refreshTable();
+// Function to search vehicles
+function searchVehicle() {
+  const query = document.getElementById("searchVehicle").value.toLowerCase();
+  const filteredVehicles = vehicles.filter(
+    (v) =>
+      v.code.toLowerCase().includes(query) ||
+      v.licensePlate.toLowerCase().includes(query)
+  );
+
+  const tableBody = document.getElementById("vehicleTableBody");
+  tableBody.innerHTML = "";
+
+  filteredVehicles.forEach((vehicle, index) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${vehicle.code}</td>
+      <td>${vehicle.licensePlate}</td>
+      <td>${vehicle.category}</td>
+      <td>${vehicle.fuelType}</td>
+      <td>${vehicle.status}</td>
+      <td>${vehicle.assignedStaff}</td>
+      <td>${vehicle.remarks}</td>
+      <td>
+        <button class="btn btn-sm btn-warning" onclick="editVehicle(${index})">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteVehicle(${index})">Delete</button>
+      </td>
+    `;
+
+    tableBody.appendChild(row);
+  });
 }
 
-// Initialize form with auto-generated code
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("vehicleCode").value = generateVehicleCode();
-});
+// Add event listener to the form
+document.getElementById("vehicleForm").addEventListener("submit", saveVehicle);

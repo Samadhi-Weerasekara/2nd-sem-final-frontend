@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monitoring Log Service</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/monitorLog.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Kanit:ital,wght@0,100;1,400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <!-- Header Section -->
+      <div class="d-flex justify-content-between mb-4">
+        <h1>Monitoring Logs</h1>
+        <button
+          class="btn btn-primary"
+          id="addLogBtn"
+          data-bs-toggle="modal"
+          data-bs-target="#logModal"
+        >
+          <i class="fas fa-plus"></i> Add Log
+        </button>
+      </div>
+
+      <!-- Search Input -->
+      <div class="mb-4">
+        <input
+          type="text"
+          id="searchLog"
+          class="form-control"
+          placeholder="Search Logs by Code or Field"
+          oninput="searchLog()"
+        />
+      </div>
+
+      <!-- Monitoring Logs Table -->
+      <table class="table table-striped" id="logTable">
+        <thead>
+          <tr>
+            <th>Log Code</th>
+            <th>Log Date</th>
+            <th>Observation</th>
+            <th>Observed Image</th>
+            <th>Fields</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="logTableBody" style="font-weight: 400">
+          <!-- Dynamic rows will be populated here -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add/Edit Log Modal -->
+    <div
+      class="modal fade"
+      id="logModal"
+      tabindex="-1"
+      aria-labelledby="logModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="logModalLabel">Add/Edit Log</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="logForm">
+              <input type="hidden" id="logId" />
+
+              <div class="mb-3">
+                <label for="logDate" class="form-label">Log Date</label>
+                <input type="date" id="logDate" class="form-control" required />
+              </div>
+
+              <div class="mb-3">
+                <label for="logDetails" class="form-label">Observation</label>
+                <textarea
+                  id="logDetails"
+                  class="form-control"
+                  rows="3"
+                  required
+                  placeholder="Enter log observation"
+                ></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label for="observedImage" class="form-label"
+                  >Observed Image</label
+                >
+                <input
+                  type="file"
+                  id="observedImage"
+                  class="form-control"
+                  accept="image/*"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="fields" class="form-label">Fields</label>
+                <select id="fields" class="form-select" multiple required>
+                  <option value="Field 1">Field 1</option>
+                  <option value="Field 2">Field 2</option>
+                  <option value="Field 3">Field 3</option>
+                  <!-- Populate dynamically from database -->
+                </select>
+                <small class="text-muted">
+                  Hold down Ctrl (Windows) or Command (Mac) to select multiple
+                  fields.
+                </small>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Save Log</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/monitorLog.js"></script>
+  </body>
+</html>

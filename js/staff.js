@@ -1,189 +1,166 @@
-// Sample data to simulate staff records (in a real app, this would come from a database)
-let staffList = [
+// Sample data to simulate vehicle records (in a real app, this would come from a database)
+let vehicles = [
   {
     id: 1,
-    firstName: "John",
-    lastName: "Doe",
-    designation: "Manager",
-    gender: "Male",
+    licensePlate: "ABC-1234",
+    category: "Sedan",
+    fuelType: "Petrol",
+    status: "Active",
+    assignedStaff: "John Doe",
+    remarks: "Regular maintenance",
     joinedDate: "2022-01-10",
-    email: "john.doe@example.com",
-    mobilePhone: "0712345678",
-    address: "123 Main St, City, State, Postal Code",
-    role: "Admin",
   },
   {
-    id: 1,
-    firstName: "John",
-    lastName: "Doe",
-    designation: "Manager",
-    gender: "Male",
-    joinedDate: "2022-01-10",
-    email: "john.doe@example.com",
-    mobilePhone: "0712345678",
-    address: "123 Main St, City, State, Postal Code",
-    role: "Admin",
+    id: 2,
+    licensePlate: "XYZ-5678",
+    category: "SUV",
+    fuelType: "Diesel",
+    status: "Inactive",
+    assignedStaff: "Jane Smith",
+    remarks: "Needs repair",
+    joinedDate: "2022-02-15",
   },
-  // Add more sample staff members as needed
+  // Add more sample vehicles as needed
 ];
 
-// Function to open the modal and reset the form for adding staff
-function openAddStaffModal() {
-  document.getElementById("staffForm").reset();
-  document.getElementById("staffId").value = ""; // Clear staff ID for new entry
-  document.getElementById("staffModalLabel").innerText = "Add Staff"; // Change modal title
-  new bootstrap.Modal(document.getElementById("staffModal")).show(); // Show the modal
+// Function to open the modal and reset the form for adding vehicles
+function openAddVehicleModal() {
+  document.getElementById("vehicleForm").reset();
+  document.getElementById("vehicleId").value = ""; // Clear vehicle ID for new entry
+  document.getElementById("vehicleModalLabel").innerText = "Add Vehicle"; // Change modal title
+  new bootstrap.Modal(document.getElementById("vehicleModal")).show(); // Show the modal
 }
 
-// Function to save staff data (add or edit)
-function saveStaff(event) {
+// Function to save vehicle data (add or edit)
+function saveVehicle(event) {
   event.preventDefault(); // Prevent form submission
 
-  const staffId = document.getElementById("staffId").value;
-  const firstName = document.getElementById("firstName").value;
-  const lastName = document.getElementById("lastName").value;
-  const designation = document.getElementById("designation").value;
-  const gender = document.getElementById("gender").value;
+  const vehicleId = document.getElementById("vehicleId").value;
+  const licensePlate = document.getElementById("licensePlate").value;
+  const category = document.getElementById("vehicleCategory").value;
+  const fuelType = document.getElementById("fuelType").value;
+  const status = document.getElementById("status").value;
+  const assignedStaff = document.getElementById("assignedStaff").value;
+  const remarks = document.getElementById("remarks").value;
   const joinedDate = document.getElementById("joinedDate").value;
-  const email = document.getElementById("email").value;
-  const mobilePhone = document.getElementById("mobilePhone").value;
-  const addressLine1 = document.getElementById("addressLine1").value;
-  const addressLine2 = document.getElementById("addressLine2").value;
-  const addressLine3 = document.getElementById("addressLine3").value;
-  const addressLine4 = document.getElementById("addressLine4").value;
-  const addressLine5 = document.getElementById("addressLine5").value;
 
-  const fullAddress = `${addressLine1}, ${addressLine2}, ${addressLine3}, ${addressLine4}, ${addressLine5}`;
-
-  if (staffId) {
-    // Edit existing staff
-    const staffIndex = staffList.findIndex((staff) => staff.id == staffId);
-    if (staffIndex > -1) {
-      staffList[staffIndex] = {
-        id: staffId,
-        firstName,
-        lastName,
-        designation,
-        gender,
+  if (vehicleId) {
+    // Edit existing vehicle
+    const vehicleIndex = vehicles.findIndex((vehicle) => vehicle.id == vehicleId);
+    if (vehicleIndex > -1) {
+      vehicles[vehicleIndex] = {
+        id: vehicleId,
+        licensePlate,
+        category,
+        fuelType,
+        status,
+        assignedStaff,
+        remarks,
         joinedDate,
-        email,
-        mobilePhone,
-        address: fullAddress,
-        role: document.getElementById("role").value,
       };
     }
   } else {
-    // Add new staff
-    const newStaff = {
-      id: staffList.length + 1, // Simple ID generation
-      firstName,
-      lastName,
-      designation,
-      gender,
+    // Add new vehicle
+    const newVehicle = {
+      id: vehicles.length + 1, // Simple ID generation
+      licensePlate,
+      category,
+      fuelType,
+      status,
+      assignedStaff,
+      remarks,
       joinedDate,
-      email,
-      mobilePhone,
-      address: fullAddress,
-      role: document.getElementById("role").value,
     };
-    staffList.push(newStaff);
+    vehicles.push(newVehicle);
   }
 
   // Update the table and close the modal
-  updateStaffTable();
-  new bootstrap.Modal(document.getElementById("staffModal")).hide();
+  updateVehicleTable();
+  new bootstrap.Modal(document.getElementById("vehicleModal")).hide();
 }
 
-// Function to update the staff table with the current staffList
-function updateStaffTable() {
-  const staffTableBody = document.getElementById("staffTableBody");
-  staffTableBody.innerHTML = ""; // Clear existing rows
+// Function to update the vehicle table with the current vehicles
+function updateVehicleTable() {
+  const vehicleTableBody = document.getElementById("vehicleTableBody");
+  vehicleTableBody.innerHTML = ""; // Clear existing rows
 
-  staffList.forEach((staff) => {
+  vehicles.forEach((vehicle) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-            <td>${staff.id}</td>
-            <td>${staff.firstName} ${staff.lastName}</td>
-            <td>${staff.designation}</td>
-            <td>${staff.gender}</td>
-            <td>${staff.joinedDate}</td>
-            <td>${staff.email}</td>
-            <td>${staff.mobilePhone}</td>
-            <td>${staff.address}</td>
-            <td>
-                <div class="btn btn-sm" onclick="editStaff(${staff.id})"><i class="fa-solid fa-pen"></i></div>
-                <div class="btn  btn-sm" onclick="deleteStaff(${staff.id})"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></div>
-
-            </td>
-        `;
-    staffTableBody.appendChild(row);
+      <td>${vehicle.id}</td>
+      <td>${vehicle.licensePlate}</td>
+      <td>${vehicle.category}</td>
+      <td>${vehicle.fuelType}</td>
+      <td>${vehicle.status}</td>
+      <td>${vehicle.assignedStaff}</td>
+      <td>${vehicle.remarks}</td>
+      <td>${vehicle.joinedDate}</td>
+      <td>
+        <div class="btn btn-sm" onclick="editVehicle(${vehicle.id})"><i class="fa-solid fa-pen"></i></div>
+        <div class="btn btn-sm" onclick="deleteVehicle(${vehicle.id})"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></div>
+      </td>
+    `;
+    vehicleTableBody.appendChild(row);
   });
 }
 
-// Function to edit a staff member
-function editStaff(id) {
-  const staff = staffList.find((staff) => staff.id === id);
-  if (staff) {
-    document.getElementById("staffId").value = staff.id;
-    document.getElementById("firstName").value = staff.firstName;
-    document.getElementById("lastName").value = staff.lastName;
-    document.getElementById("designation").value = staff.designation;
-    document.getElementById("gender").value = staff.gender;
-    document.getElementById("joinedDate").value = staff.joinedDate;
-    document.getElementById("email").value = staff.email;
-    document.getElementById("mobilePhone").value = staff.mobilePhone;
+// Function to edit a vehicle
+function editVehicle(id) {
+  const vehicle = vehicles.find((vehicle) => vehicle.id === id);
+  if (vehicle) {
+    document.getElementById("vehicleId").value = vehicle.id;
+    document.getElementById("licensePlate").value = vehicle.licensePlate;
+    document.getElementById("vehicleCategory").value = vehicle.category;
+    document.getElementById("fuelType").value = vehicle.fuelType;
+    document.getElementById("status").value = vehicle.status;
+    document.getElementById("assignedStaff").value = vehicle.assignedStaff;
+    document.getElementById("remarks").value = vehicle.remarks;
+    document.getElementById("joinedDate").value = vehicle.joinedDate;
 
-    const addressParts = staff.address.split(", ");
-    document.getElementById("addressLine1").value = addressParts[0] || "";
-    document.getElementById("addressLine2").value = addressParts[1] || "";
-    document.getElementById("addressLine3").value = addressParts[2] || "";
-    document.getElementById("addressLine4").value = addressParts[3] || "";
-    document.getElementById("addressLine5").value = addressParts[4] || "";
-
-    document.getElementById("staffModalLabel").innerText = "Edit Staff"; // Change modal title
-    openAddStaffModal(); // Open the modal
+    document.getElementById("vehicleModalLabel").innerText = "Edit Vehicle"; // Change modal title
+    openAddVehicleModal(); // Open the modal
   }
 }
 
-// Function to delete a staff member
-function deleteStaff(id) {
-  staffList = staffList.filter((staff) => staff.id !== id);
-  updateStaffTable();
+// Function to delete a vehicle
+function deleteVehicle(id) {
+  vehicles = vehicles.filter((vehicle) => vehicle.id !== id);
+  updateVehicleTable();
 }
 
-// Function to search for staff by name
-function searchStaff() {
-  const query = document.getElementById("searchStaff").value.toLowerCase();
-  const filteredStaff = staffList.filter((staff) => {
-    return `${staff.firstName} ${staff.lastName}`.toLowerCase().includes(query);
+// Function to search for vehicles by license plate
+function searchVehicle() {
+  const query = document.getElementById("searchVehicle").value.toLowerCase();
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    return vehicle.licensePlate.toLowerCase().includes(query);
   });
 
   // Update the table with filtered results
-  const staffTableBody = document.getElementById("staffTableBody");
-  staffTableBody.innerHTML = ""; // Clear existing rows
+  const vehicleTableBody = document.getElementById("vehicleTableBody");
+  vehicleTableBody.innerHTML = ""; // Clear existing rows
 
-  filteredStaff.forEach((staff) => {
+  filteredVehicles.forEach((vehicle) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-            <td>${staff.id}</td>
-            <td>${staff.firstName} ${staff.lastName}</td>
-            <td>${staff.designation}</td>
-            <td>${staff.gender}</td>
-            <td>${staff.joinedDate}</td>
-            <td>${staff.email}</td>
-            <td>${staff.mobilePhone}</td>
-            <td>${staff.address}</td>
-            <td>
-                <button class="btn btn-info" onclick="editStaff(${staff.id})">Edit</button>
-                <button class="btn btn-danger" onclick="deleteStaff(${staff.id})">Delete</button>
-            </td>
-        `;
-    staffTableBody.appendChild(row);
+      <td>${vehicle.id}</td>
+      <td>${vehicle.licensePlate}</td>
+      <td>${vehicle.category}</td>
+      <td>${vehicle.fuelType}</td>
+      <td>${vehicle.status}</td>
+      <td>${vehicle.assignedStaff}</td>
+      <td>${vehicle.remarks}</td>
+      <td>${vehicle.joinedDate}</td>
+      <td>
+        <button class="btn btn-info" onclick="editVehicle(${vehicle.id})">Edit</button>
+        <button class="btn btn-danger" onclick="deleteVehicle(${vehicle.id})">Delete</button>
+      </td>
+    `;
+    vehicleTableBody.appendChild(row);
   });
 }
 
 // Event listener for form submission
-document.getElementById("staffForm").addEventListener("submit", saveStaff);
+document.getElementById("vehicleForm").addEventListener("submit", saveVehicle);
 
-// Initial population of the staff table
-updateStaffTable();
+// Initial population of the vehicle table
+updateVehicleTable();
