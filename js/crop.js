@@ -1,3 +1,4 @@
+document.addEventListener("DOMContentLoaded", initValues);
 let editingCropCode = null; // Track the crop being edited
 let crops = [
   {
@@ -7,7 +8,79 @@ let crops = [
     cropCategory: "Cereal",
     cropSeason: "Summer",
     cropField: "Field A",
-    cropImage: "assets/rice.jpg"
+    cropImage: "assets/rice.jpg",
+  },
+  {
+    cropCode: "CROP-1002",
+    cropCommonName: "Wheat",
+    cropScientificName: "Triticum aestivum",
+    cropCategory: "Cereal",
+    cropSeason: "Winter",
+    cropField: "Field B",
+    cropImage: "assets/wheat.jpg",
+  },
+  {
+    cropCode: "CROP-1003",
+    cropCommonName: "Corn",
+    cropScientificName: "Zea mays",
+    cropCategory: "Cereal",
+    cropSeason: "Summer",
+    cropField: "Field C",
+    cropImage: "assets/corn.jpg",
+  },
+  {
+    cropCode: "CROP-1002",
+    cropCommonName: "Wheat",
+    cropScientificName: "Triticum aestivum",
+    cropCategory: "Cereal",
+    cropSeason: "Winter",
+    cropField: "Field B",
+    cropImage: "assets/wheat.jpg",
+  },
+  {
+    cropCode: "CROP-1003",
+    cropCommonName: "Corn",
+    cropScientificName: "Zea mays",
+    cropCategory: "Cereal",
+    cropSeason: "Summer",
+    cropField: "Field C",
+    cropImage: "assets/corn.jpg",
+  },
+  {
+    cropCode: "CROP-1002",
+    cropCommonName: "Wheat",
+    cropScientificName: "Triticum aestivum",
+    cropCategory: "Cereal",
+    cropSeason: "Winter",
+    cropField: "Field B",
+    cropImage: "assets/wheat.jpg",
+  },
+  {
+    cropCode: "CROP-1003",
+    cropCommonName: "Corn",
+    cropScientificName: "Zea mays",
+    cropCategory: "Cereal",
+    cropSeason: "Summer",
+    cropField: "Field C",
+    cropImage: "assets/corn.jpg",
+  },
+  {
+    cropCode: "CROP-1002",
+    cropCommonName: "Wheat",
+    cropScientificName: "Triticum aestivum",
+    cropCategory: "Cereal",
+    cropSeason: "Winter",
+    cropField: "Field B",
+    cropImage: "assets/wheat.jpg",
+  },
+  {
+    cropCode: "CROP-1003",
+    cropCommonName: "Corn",
+    cropScientificName: "Zea mays",
+    cropCategory: "Cereal",
+    cropSeason: "Summer",
+    cropField: "Field C",
+    cropImage: "assets/corn.jpg",
   },
   {
     cropCode: "CROP-1002",
@@ -27,14 +100,32 @@ let crops = [
     cropField: "Field C",
     cropImage: "assets/corn.jpg"
   }
-]
+];
+
+function initValues() {
+  const tableBody = document.getElementById("cropTableBody");
+  crops.forEach((crop) => {
+    const row = document.createElement("tr");
+    row.innerHTML = generateRowHTML(
+      crop.cropCode,
+      crop.cropCommonName,
+      crop.cropScientificName,
+      crop.cropCategory,
+      crop.cropSeason,
+      crop.cropField,
+      crop.cropImage
+    );
+    tableBody.appendChild(row);
+  });
+}
 // Add Event Listener to the Form
 document.getElementById("cropForm").addEventListener("submit", (event) => {
   event.preventDefault();
 
   const cropCode = editingCropCode || `CROP-${Date.now()}`; // Use existing code if editing, else generate a unique code
   const cropCommonName = document.getElementById("cropCommonName").value;
-  const cropScientificName = document.getElementById("cropScientificName").value;
+  const cropScientificName =
+    document.getElementById("cropScientificName").value;
   const cropCategory = document.getElementById("cropCategory").value;
   const cropSeason = document.getElementById("cropSeason").value;
   const cropField = document.getElementById("cropField").value;
@@ -80,7 +171,15 @@ document.getElementById("cropForm").addEventListener("submit", (event) => {
 });
 
 // Generate Table Row HTML
-function generateRowHTML(cropCode, commonName, scientificName, category, season, field, image) {
+function generateRowHTML(
+  cropCode,
+  commonName,
+  scientificName,
+  category,
+  season,
+  field,
+  image
+) {
   return `
     <td>${cropCode}</td>
     <td>${commonName}</td>
@@ -135,7 +234,9 @@ function editCrop(cropCode) {
   document.getElementById("cropImage").value = "";
 
   // Open the modal
-  bootstrap.Modal.getOrCreateInstance(document.getElementById("cropModal")).show();
+  bootstrap.Modal.getOrCreateInstance(
+    document.getElementById("cropModal")
+  ).show();
 }
 
 // Delete Crop
@@ -157,7 +258,9 @@ function searchCrop() {
   } else {
     // Otherwise, filter rows based on the query
     rows.forEach((row) => {
-      const commonName = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
+      const commonName = row
+        .querySelector("td:nth-child(2)")
+        .innerText.toLowerCase();
       row.style.display = commonName.includes(query) ? "" : "none";
     });
   }

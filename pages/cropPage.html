@@ -45,23 +45,27 @@
     </div>
 
     <!-- Table for Crop List -->
-    <table class="table table-striped" id="cropTable">
-      <thead>
-        <tr>
-          <th>Crop Code</th>
-          <th>Common Name</th>
-          <th>Scientific Name</th>
-          <th>Category</th>
-          <th>Season</th>
-          <th>Field</th>
-          <th>Image</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="cropTableBody">
-        <!-- Dynamic rows will be inserted here -->
-      </tbody>
-    </table>
+<!-- Table for Crop List -->
+<div class="table-container">
+  <table class="table table-striped" id="cropTable">
+    <thead>
+      <tr>
+        <th>Crop Code</th>
+        <th>Common Name</th>
+        <th>Scientific Name</th>
+        <th>Category</th>
+        <th>Season</th>
+        <th>Field</th>
+        <th>Image</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="cropTableBody" class="cropTableBody">
+      <!-- Dynamic rows will be inserted here -->
+    </tbody>
+  </table>
+</div>
+
 
     <!-- Add/Edit Crop Modal -->
     <div
@@ -154,6 +158,7 @@
       </div>
     </div>
   </div>
+  
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/js/crop.js"></script>

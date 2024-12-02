@@ -1,40 +1,39 @@
 /* Sidebar */
-body{
+body {
   font-family: "Kanit", sans-serif;
- 
 }
 
-  /* Main Content */
-  .main-content {
-    padding: 20px;
-    background-color: #f5f5f5;
-    min-height: 100vh;
-  }
-  
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  header .greeting h2 {
-    margin: 0;
-  }
-  
-  header input {
-    padding: 10px;
-    width: 300px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .overview {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-  }
-  
+/* Main Content */
+.main-content {
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+header .greeting h2 {
+  margin: 0;
+}
+
+header input {
+  padding: 10px;
+  width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.overview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
 /* Card Styles */
 .card {
   display: flex;
@@ -49,38 +48,39 @@ body{
 
 .card i {
   font-size: 40px; /* Adjust icon size */
-  color: #5E7B4E; /* Match the theme with sidebar */
+  color: #5e7b4e; /* Match the theme with sidebar */
 }
 
-  .weather p{
-    color: #868585;
-  }
-  .tasks ul li{
-    color: #868585;
-  }
-  .live-location{
-    margin-top: 0.5rem;
-  }
-  .live-location .map {
-    margin: 20px 0;
-    height: 200px;
-    background-color: #e0e0e0;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .weather-tasks {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-  
-  .weather, .tasks {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
+.weather p {
+  color: #868585;
+}
+.tasks ul li {
+  color: #868585;
+}
+.live-location {
+  margin-top: 0.5rem;
+}
+.live-location .map {
+  margin: 20px 0;
+  height: 200px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.weather-tasks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.weather,
+.tasks {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+

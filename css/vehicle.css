@@ -1,0 +1,12 @@
+.main-container {
+    padding: 25px;
+  }
+  #addVehicleBtn {
+    border-radius: 10px;
+    background-color: #4CAF50;
+    color: #ffff;
+    border: none;
+  }
+  h1{
+      font-family: "Kanit", sans-serif;
+  }
