@@ -92,6 +92,7 @@ function updateEquipmentTable() {
 
 // Edit Equipment
 function editEquipment(id) {
+  document.getElementById("equipmentModalLabel").innerText = "Edit Equipment";
   editingEquipmentId = id; // Set editing mode
   const equipment = equipmentList.find((item) => item.id === id);
 
