@@ -30,12 +30,17 @@ function initEquipmentManagement() {
   ];
   updateEquipmentTable();
 }
-
+// Add Equipment (open modal for adding new equipment)
+document.getElementById("addEquipmentBtn").addEventListener("click", () => {
+  editingEquipmentId = null; // Reset editing mode
+  document.getElementById("equipmentForm").reset(); // Clear form fields
+  document.getElementById("equipmentModalLabel").innerText = "Add Equipment"; // Set title
+});
 // Save or Update Equipment
 function saveEquipment(event) {
   event.preventDefault();
 
-  const id = editingEquipmentId || `EQUIP-${Date.now()}`;
+  const id = editingEquipmentId || `EQUIP-${Date.now()}`; // Use ID for new or existing equipment
   const name = document.getElementById("equipmentName").value;
   const type = document.getElementById("equipmentType").value;
   const status = document.getElementById("status").value;
@@ -47,20 +52,16 @@ function saveEquipment(event) {
     const equipment = equipmentList.find(
       (item) => item.id === editingEquipmentId
     );
-    equipment.name = name;
-    equipment.type = type;
-    equipment.status = status;
-    equipment.staff = staff;
-    equipment.field = field;
+    Object.assign(equipment, { name, type, status, staff, field });
   } else {
     // Add new equipment
     equipmentList.push({ id, name, type, status, staff, field });
   }
 
   editingEquipmentId = null; // Reset editing mode
-  document.getElementById("equipmentForm").reset();
-  bootstrap.Modal.getInstance(document.getElementById("equipmentModal")).hide();
-  updateEquipmentTable();
+  document.getElementById("equipmentForm").reset(); // Clear form
+  bootstrap.Modal.getInstance(document.getElementById("equipmentModal")).hide(); // Hide modal
+  updateEquipmentTable(); // Refresh table
 }
 
 // Update Equipment Table
@@ -91,21 +92,23 @@ function updateEquipmentTable() {
 }
 
 // Edit Equipment
+// Edit Equipment
 function editEquipment(id) {
   document.getElementById("equipmentModalLabel").innerText = "Edit Equipment";
   editingEquipmentId = id; // Set editing mode
   const equipment = equipmentList.find((item) => item.id === id);
 
-  document.getElementById("equipmentName").value = equipment.name;
-  document.getElementById("equipmentType").value = equipment.type;
-  document.getElementById("status").value = equipment.status;
-  document.getElementById("assignedStaff").value = equipment.staff;
-  document.getElementById("assignedField").value = equipment.field;
+  if (equipment) {
+    document.getElementById("equipmentName").value = equipment.name;
+    document.getElementById("equipmentType").value = equipment.type;
+    document.getElementById("status").value = equipment.status;
+    document.getElementById("assignedStaff").value = equipment.staff;
+    document.getElementById("assignedField").value = equipment.field;
 
-  document.getElementById("equipmentModalLabel").innerText = "Edit Equipment";
-  bootstrap.Modal.getOrCreateInstance(
-    document.getElementById("equipmentModal")
-  ).show();
+    bootstrap.Modal.getOrCreateInstance(
+      document.getElementById("equipmentModal")
+    ).show(); // Show modal
+  }
 }
 
 // Delete Equipment
