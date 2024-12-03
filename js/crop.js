@@ -239,11 +239,50 @@ function editCrop(cropCode) {
   ).show();
 }
 
-// Delete Crop
 function deleteCrop(cropCode) {
-  const row = document.querySelector(`tr[data-code="${cropCode}"]`);
-  row.remove();
+  Swal.fire({
+    title: "Are you sure?", // Confirmation title
+    text: "Do you really want to delete this crop?", // Confirmation message
+    icon: "warning", // Warning icon
+    showCancelButton: true, // Show "Cancel" button
+    confirmButtonText: "Yes, delete it!", // Text for the confirmation button
+    cancelButtonText: "Cancel" // Text for the cancel button
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Correctly filter the crops array using cropCode
+      crops = crops.filter((crop) => crop.cropCode !== cropCode);
+
+      // Refresh the crop table
+      updateCropTable();
+
+      // Display success message
+      Swal.fire("Deleted!", "The crop has been deleted.", "success");
+    }
+  });
 }
+
+// Function to refresh the crop table after deletion
+function updateCropTable() {
+  const tableBody = document.getElementById("cropTableBody");
+  tableBody.innerHTML = ""; // Clear the current rows
+
+  crops.forEach((crop) => {
+    const row = document.createElement("tr");
+    row.setAttribute("data-code", crop.cropCode); // Add data attribute for cropCode
+    row.innerHTML = generateRowHTML(
+      crop.cropCode,
+      crop.cropCommonName,
+      crop.cropScientificName,
+      crop.cropCategory,
+      crop.cropSeason,
+      crop.cropField,
+      crop.cropImage
+    );
+    tableBody.appendChild(row);
+  });
+}
+
+
 
 // Search Functionality
 function searchCrop() {

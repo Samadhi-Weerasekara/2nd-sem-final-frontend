@@ -105,11 +105,29 @@ function editField(fieldId) {
 }
 
 
-// Delete Field
 function deleteField(fieldId) {
-  const row = document.querySelector(`tr[data-id="${fieldId}"]`);
-  row.remove();
+  // Show SweetAlert confirmation dialog
+  Swal.fire({
+    title: "Are you sure?", // Confirmation title
+    text: "Do you really want to delete this field?", // Confirmation message
+    icon: "warning", // Warning icon
+    showCancelButton: true, // Show "Cancel" button
+    confirmButtonText: "Yes, delete it!", // Text for the confirmation button
+    cancelButtonText: "Cancel" // Text for the cancel button
+  }).then(result => {
+    if (result.isConfirmed) {
+      // Remove the row from the DOM
+      const row = document.querySelector(`tr[data-id="${fieldId}"]`);
+      if (row) {
+        row.remove();
+      }
+
+      // Display success message
+      Swal.fire("Deleted!", "The field has been deleted.", "success");
+    }
+  });
 }
+
 
 // Search Functionality
 function searchField() {
