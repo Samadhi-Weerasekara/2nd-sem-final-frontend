@@ -1,46 +1,63 @@
-document.addEventListener("DOMContentLoaded", initEquipmentManagement);
+document.addEventListener("DOMContentLoaded", () => {
+  initEquipmentManagement();
+  fetchEquipmentFromBackend();
+});
 
 let equipmentList = []; // Stores all equipment data
 let editingEquipmentId = null; // Tracks the ID of the equipment being edited
 
+// Fetch equipment data from the backend
+function fetchEquipmentFromBackend() {
+  fetch("http://localhost:8080/api/v1/equipments/allEquipments", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        console.error("Response Status:", response.status);
+        throw new Error("Failed to fetch equipment data");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Transform backend data to match frontend expectations
+      equipmentList = data.map((equipment) => ({
+        id: equipment.equipmentId, // Map equipmentId to id
+        name: equipment.name,
+        type: equipment.type,
+        status: equipment.status,
+        staff: equipment.staffIds ? equipment.staffIds.join(", ") : "N/A",
+        field: equipment.fieldIds ? equipment.fieldIds.join(", ") : "N/A",
+      }));
+
+      updateEquipmentTable(); // Refresh the table
+    })
+    .catch((error) => {
+      console.error("Error fetching equipment data:", error);
+      Swal.fire("Error", "Unable to fetch equipment data from the backend.", "error");
+    });
+}
+
+// Initialize equipment management UI
 function initEquipmentManagement() {
-  // Add event listener to the form
   document
     .getElementById("equipmentForm")
     .addEventListener("submit", saveEquipment);
 
-
-  equipmentList = [
-    {
-      id: "EQUIP-1001",
-      name: "Tractor",
-      type: "Mechanical",
-      status: "Available",
-      staff: "John Doe",
-      field: "Field A",
-    },
-    {
-      id: "EQUIP-1002",
-      name: "Irrigation Pump",
-      type: "Electrical",
-      status: "Unavailable",
-      staff: "N/A",
-      field: "Field B",
-    },
-  ];
-  updateEquipmentTable();
+  document.getElementById("addEquipmentBtn").addEventListener("click", () => {
+    editingEquipmentId = null; // Reset editing mode
+    document.getElementById("equipmentForm").reset(); // Clear form fields
+    document.getElementById("equipmentModalLabel").innerText = "Add Equipment"; // Set modal title
+  });
 }
-// Add Equipment (open modal for adding new equipment)
-document.getElementById("addEquipmentBtn").addEventListener("click", () => {
-  editingEquipmentId = null; // Reset editing mode
-  document.getElementById("equipmentForm").reset(); // Clear form fields
-  document.getElementById("equipmentModalLabel").innerText = "Add Equipment"; // Set title
-});
+
 // Save or Update Equipment
 function saveEquipment(event) {
   event.preventDefault();
 
-  const id = editingEquipmentId || `EQUIP-${Date.now()}`; // Use ID for new or existing equipment
+  const id = editingEquipmentId || `EQUIP-${Date.now()}`;
   const name = document.getElementById("equipmentName").value;
   const type = document.getElementById("equipmentType").value;
   const status = document.getElementById("status").value;
@@ -49,9 +66,7 @@ function saveEquipment(event) {
 
   if (editingEquipmentId) {
     // Update existing equipment
-    const equipment = equipmentList.find(
-      (item) => item.id === editingEquipmentId
-    );
+    const equipment = equipmentList.find((item) => item.id === editingEquipmentId);
     Object.assign(equipment, { name, type, status, staff, field });
   } else {
     // Add new equipment
@@ -79,10 +94,10 @@ function updateEquipmentTable() {
       <td>${equipment.staff}</td>
       <td>${equipment.field}</td>
       <td>
-        <button class="btn btn-sm " onclick="editEquipment('${equipment.id}')">
+        <button class="btn btn-sm" onclick="editEquipment('${equipment.id}')">
           <i class="fa-solid fa-pen"></i>
         </button>
-        <button class="btn btn-sm " onclick="deleteEquipment('${equipment.id}')">
+        <button class="btn btn-sm" onclick="deleteEquipment('${equipment.id}')">
           <i class="fa-solid fa-trash" style="color: #e9542f;"></i>
         </button>
       </td>
@@ -94,9 +109,9 @@ function updateEquipmentTable() {
 // Edit Equipment
 function editEquipment(id) {
   document.getElementById("equipmentModalLabel").innerText = "Edit Equipment";
-  editingEquipmentId = id; // Set editing mode
-  const equipment = equipmentList.find((item) => item.id === id);
+  editingEquipmentId = id;
 
+  const equipment = equipmentList.find((item) => item.id === id);
   if (equipment) {
     document.getElementById("equipmentName").value = equipment.name;
     document.getElementById("equipmentType").value = equipment.type;
@@ -104,9 +119,7 @@ function editEquipment(id) {
     document.getElementById("assignedStaff").value = equipment.staff;
     document.getElementById("assignedField").value = equipment.field;
 
-    bootstrap.Modal.getOrCreateInstance(
-      document.getElementById("equipmentModal")
-    ).show(); // Show modal
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("equipmentModal")).show();
   }
 }
 
@@ -136,7 +149,6 @@ function searchEquipment() {
   rows.forEach((row) => {
     const id = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
     const name = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
-    row.style.display =
-      id.includes(query) || name.includes(query) ? "" : "none";
+    row.style.display = id.includes(query) || name.includes(query) ? "" : "none";
   });
 }
