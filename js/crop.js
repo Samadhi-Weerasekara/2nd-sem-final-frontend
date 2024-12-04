@@ -6,7 +6,7 @@ let editingCropCode = null; // Track the crop being edited
 let crops = [];
 
 function fetchCropsFromBackend() {
-  fetch("http://localhost:8080/api/v1/crops", {
+  fetch("http://localhost:8080/api/v1/staff/allstaff", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

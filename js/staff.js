@@ -1,31 +1,64 @@
+document.addEventListener("DOMContentLoaded", () => {
+  fetchStaffFromBackend();
+});
+
 // Sample data to simulate staff records (in a real app, this would come from a database)
-let staffList = [
-  {
-    id: 1,
-    firstName: "John",
-    lastName: "Doe",
-    designation: "Manager",
-    gender: "Male",
-    joinedDate: "2022-01-10",
-    email: "john.doe@example.com",
-    mobilePhone: "0712345678",
-    address: "123 Main St, City, State, Postal Code",
-    role: "Admin",
-  },
-  {
-    id: 2,
-    firstName: "John",
-    lastName: "Doe",
-    designation: "Manager",
-    gender: "Male",
-    joinedDate: "2022-01-10",
-    email: "john.doe@example.com",
-    mobilePhone: "0712345678",
-    address: "123 Main St, City, State, Postal Code",
-    role: "Admin",
-  },
-  // Add more sample staff members as needed
-];
+let staffList = [];
+
+// Fetch staff data from the backend
+function fetchStaffFromBackend() {
+  fetch("http://localhost:8080/api/v1/staff/allstaff", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch staff data");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Process the data and populate staffList
+      staffList = data.map((staff) => ({
+        id: staff.id,
+        firstName: staff.firstName,
+        lastName: staff.lastName,
+        designation: staff.designation,
+        gender: staff.gender,
+        joinedDate: staff.joinedDate,
+        email: staff.email,
+        mobilePhone: staff.contactNo,
+        address: `${staff.address.line1}, ${staff.address.line2}, ${staff.address.line3}, ${staff.address.line4}, ${staff.address.line5}`,
+        role: staff.role,
+      }));
+
+      // Update the staff table with the fetched data
+      updateStaffTable();
+    })
+    .catch((error) => {
+      console.error("Error fetching staff data:", error);
+    });
+}
+
+// Function to generate HTML for a staff row
+function generateRowHTML(id, firstName, lastName, designation, gender, joinedDate, email, mobilePhone, address, role) {
+  return `
+    <td>${id}</td>
+    <td>${firstName} ${lastName}</td>
+    <td>${designation}</td>
+    <td>${gender}</td>
+    <td>${joinedDate}</td>
+    <td>${email}</td>
+    <td>${mobilePhone}</td>
+    <td>${address}</td>
+    <td>
+        <div class="btn btn-sm" onclick="editStaff('${id}')"><i class="fa-solid fa-pen"></i></div>
+        <div class="btn btn-sm" onclick="deleteStaff('${id}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></div>
+    </td>
+  `;
+}
 
 // Function to open the modal and reset the form for adding staff
 function openAddStaffModal() {
@@ -57,7 +90,7 @@ function saveStaff(event) {
 
   if (staffId) {
     // Edit existing staff
-    const staffIndex = staffList.findIndex((staff) => staff.id == staffId);
+    const staffIndex = staffList.findIndex((staff) => staff.id === staffId);
     if (staffIndex > -1) {
       staffList[staffIndex] = {
         id: staffId,
@@ -73,9 +106,9 @@ function saveStaff(event) {
       };
     }
   } else {
-    // Add new staff
+    // Add new staff (backend should provide an ID for new entries)
     const newStaff = {
-      id: staffList.length + 1, // Simple ID generation
+      id: staffList.length + 1, // Placeholder until backend responds
       firstName,
       lastName,
       designation,
@@ -100,22 +133,20 @@ function updateStaffTable() {
   staffTableBody.innerHTML = ""; // Clear existing rows
 
   staffList.forEach((staff) => {
+    const rowHTML = generateRowHTML(
+      staff.id,
+      staff.firstName,
+      staff.lastName,
+      staff.designation,
+      staff.gender,
+      staff.joinedDate,
+      staff.email,
+      staff.mobilePhone,
+      staff.address,
+      staff.role
+    );
     const row = document.createElement("tr");
-    row.innerHTML = `
-            <td>${staff.id}</td>
-            <td>${staff.firstName} ${staff.lastName}</td>
-            <td>${staff.designation}</td>
-            <td>${staff.gender}</td>
-            <td>${staff.joinedDate}</td>
-            <td>${staff.email}</td>
-            <td>${staff.mobilePhone}</td>
-            <td>${staff.address}</td>
-            <td>
-                <div class="btn btn-sm" onclick="editStaff(${staff.id})"><i class="fa-solid fa-pen"></i></div>
-                <div class="btn  btn-sm" onclick="deleteStaff(${staff.id})"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></div>
-
-            </td>
-        `;
+    row.innerHTML = rowHTML;
     staffTableBody.appendChild(row);
   });
 }
@@ -146,7 +177,6 @@ function editStaff(id) {
 }
 
 // Function to delete a staff member
-
 function deleteStaff(id) {
   // Show SweetAlert confirmation dialog
   Swal.fire({
@@ -155,7 +185,7 @@ function deleteStaff(id) {
     icon: "warning", // Warning icon
     showCancelButton: true, // Show "Cancel" button
     confirmButtonText: "Yes, delete it!", // Text for the confirmation button
-    cancelButtonText: "Cancel" // Text for the cancel button
+    cancelButtonText: "Cancel", // Text for the cancel button
   }).then((result) => {
     if (result.isConfirmed) {
       // Remove staff member from the list
@@ -170,7 +200,6 @@ function deleteStaff(id) {
   });
 }
 
-
 // Function to search for staff by name
 function searchStaff() {
   const query = document.getElementById("searchStaff").value.toLowerCase();
@@ -183,21 +212,20 @@ function searchStaff() {
   staffTableBody.innerHTML = ""; // Clear existing rows
 
   filteredStaff.forEach((staff) => {
+    const rowHTML = generateRowHTML(
+      staff.id,
+      staff.firstName,
+      staff.lastName,
+      staff.designation,
+      staff.gender,
+      staff.joinedDate,
+      staff.email,
+      staff.mobilePhone,
+      staff.address,
+      staff.role
+    );
     const row = document.createElement("tr");
-    row.innerHTML = `
-            <td>${staff.id}</td>
-            <td>${staff.firstName} ${staff.lastName}</td>
-            <td>${staff.designation}</td>
-            <td>${staff.gender}</td>
-            <td>${staff.joinedDate}</td>
-            <td>${staff.email}</td>
-            <td>${staff.mobilePhone}</td>
-            <td>${staff.address}</td>
-            <td>
-                <button class="btn btn-info" onclick="editStaff(${staff.id})">Edit</button>
-                <button class="btn btn-danger" onclick="deleteStaff(${staff.id})">Delete</button>
-            </td>
-        `;
+    row.innerHTML = rowHTML;
     staffTableBody.appendChild(row);
   });
 }
@@ -206,4 +234,5 @@ function searchStaff() {
 document.getElementById("staffForm").addEventListener("submit", saveStaff);
 
 // Initial population of the staff table
-updateStaffTable();
+// No longer needed since the table is updated after fetching data
+// updateStaffTable();
