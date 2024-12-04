@@ -1,106 +1,146 @@
-document.addEventListener("DOMContentLoaded", initValues);
+document.addEventListener("DOMContentLoaded", () => {
+  initValues();
+  fetchCropsFromBackend();
+});
 let editingCropCode = null; // Track the crop being edited
 let crops = [
-  {
-    cropCode: "CROP-1001",
-    cropCommonName: "Rice",
-    cropScientificName: "Oryza sativa",
-    cropCategory: "Cereal",
-    cropSeason: "Summer",
-    cropField: "Field A",
-    cropImage: "assets/rice.jpg",
-  },
-  {
-    cropCode: "CROP-1002",
-    cropCommonName: "Wheat",
-    cropScientificName: "Triticum aestivum",
-    cropCategory: "Cereal",
-    cropSeason: "Winter",
-    cropField: "Field B",
-    cropImage: "assets/wheat.jpg",
-  },
-  {
-    cropCode: "CROP-1003",
-    cropCommonName: "Corn",
-    cropScientificName: "Zea mays",
-    cropCategory: "Cereal",
-    cropSeason: "Summer",
-    cropField: "Field C",
-    cropImage: "assets/corn.jpg",
-  },
-  {
-    cropCode: "CROP-1002",
-    cropCommonName: "Wheat",
-    cropScientificName: "Triticum aestivum",
-    cropCategory: "Cereal",
-    cropSeason: "Winter",
-    cropField: "Field B",
-    cropImage: "assets/wheat.jpg",
-  },
-  {
-    cropCode: "CROP-1003",
-    cropCommonName: "Corn",
-    cropScientificName: "Zea mays",
-    cropCategory: "Cereal",
-    cropSeason: "Summer",
-    cropField: "Field C",
-    cropImage: "assets/corn.jpg",
-  },
-  {
-    cropCode: "CROP-1002",
-    cropCommonName: "Wheat",
-    cropScientificName: "Triticum aestivum",
-    cropCategory: "Cereal",
-    cropSeason: "Winter",
-    cropField: "Field B",
-    cropImage: "assets/wheat.jpg",
-  },
-  {
-    cropCode: "CROP-1003",
-    cropCommonName: "Corn",
-    cropScientificName: "Zea mays",
-    cropCategory: "Cereal",
-    cropSeason: "Summer",
-    cropField: "Field C",
-    cropImage: "assets/corn.jpg",
-  },
-  {
-    cropCode: "CROP-1002",
-    cropCommonName: "Wheat",
-    cropScientificName: "Triticum aestivum",
-    cropCategory: "Cereal",
-    cropSeason: "Winter",
-    cropField: "Field B",
-    cropImage: "assets/wheat.jpg",
-  },
-  {
-    cropCode: "CROP-1003",
-    cropCommonName: "Corn",
-    cropScientificName: "Zea mays",
-    cropCategory: "Cereal",
-    cropSeason: "Summer",
-    cropField: "Field C",
-    cropImage: "assets/corn.jpg",
-  },
-  {
-    cropCode: "CROP-1002",
-    cropCommonName: "Wheat",
-    cropScientificName: "Triticum aestivum",
-    cropCategory: "Cereal",
-    cropSeason: "Winter",
-    cropField: "Field B",
-    cropImage: "assets/wheat.jpg"
-  },
-  {
-    cropCode: "CROP-1003",
-    cropCommonName: "Corn",
-    cropScientificName: "Zea mays",
-    cropCategory: "Cereal",
-    cropSeason: "Summer",
-    cropField: "Field C",
-    cropImage: "assets/corn.jpg"
-  }
+  //{
+  //   cropCode: "CROP-1001",
+  //   cropCommonName: "Rice",
+  //   cropScientificName: "Oryza sativa",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Summer",
+  //   cropField: "Field A",
+  //   cropImage: "assets/rice.jpg",
+  // },
+  // {
+  //   cropCode: "CROP-1002",
+  //   cropCommonName: "Wheat",
+  //   cropScientificName: "Triticum aestivum",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Winter",
+  //   cropField: "Field B",
+  //   cropImage: "assets/wheat.jpg",
+  // },
+  // {
+  //   cropCode: "CROP-1003",
+  //   cropCommonName: "Corn",
+  //   cropScientificName: "Zea mays",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Summer",
+  //   cropField: "Field C",
+  //   cropImage: "assets/corn.jpg",
+  // },
+  // {
+  //   cropCode: "CROP-1002",
+  //   cropCommonName: "Wheat",
+  //   cropScientificName: "Triticum aestivum",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Winter",
+  //   cropField: "Field B",
+  //   cropImage: "assets/wheat.jpg",
+  // },
+  // {
+  //   cropCode: "CROP-1003",
+  //   cropCommonName: "Corn",
+  //   cropScientificName: "Zea mays",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Summer",
+  //   cropField: "Field C",
+  //   cropImage: "assets/corn.jpg",
+  // },
+  // {
+  //   cropCode: "CROP-1002",
+  //   cropCommonName: "Wheat",
+  //   cropScientificName: "Triticum aestivum",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Winter",
+  //   cropField: "Field B",
+  //   cropImage: "assets/wheat.jpg",
+  // },
+  // {
+  //   cropCode: "CROP-1003",
+  //   cropCommonName: "Corn",
+  //   cropScientificName: "Zea mays",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Summer",
+  //   cropField: "Field C",
+  //   cropImage: "assets/corn.jpg",
+  // },
+  // {
+  //   cropCode: "CROP-1002",
+  //   cropCommonName: "Wheat",
+  //   cropScientificName: "Triticum aestivum",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Winter",
+  //   cropField: "Field B",
+  //   cropImage: "assets/wheat.jpg",
+  // },
+  // {
+  //   cropCode: "CROP-1003",
+  //   cropCommonName: "Corn",
+  //   cropScientificName: "Zea mays",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Summer",
+  //   cropField: "Field C",
+  //   cropImage: "assets/corn.jpg",
+  // },
+  // {
+  //   cropCode: "CROP-1002",
+  //   cropCommonName: "Wheat",
+  //   cropScientificName: "Triticum aestivum",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Winter",
+  //   cropField: "Field B",
+  //   cropImage: "assets/wheat.jpg"
+  // },
+  // {
+  //   cropCode: "CROP-1003",
+  //   cropCommonName: "Corn",
+  //   cropScientificName: "Zea mays",
+  //   cropCategory: "Cereal",
+  //   cropSeason: "Summer",
+  //   cropField: "Field C",
+  //   cropImage: "assets/corn.jpg"
+  // }
 ];
+
+function fetchCropsFromBackend() {
+  fetch("http://localhost:8080/api/v1/crops", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch crops");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      const crops = data.map((crop) => ({
+        cropCode: crop.cropCode,
+        commonName: crop.commonName.trim(), // Trimming extra spaces
+        scientificName: crop.scientificName.trim(), // Trimming extra spaces
+        cropImage: crop.cropImage, // Assuming it's a valid base64 string
+        category: crop.category,
+        cropSeason: crop.cropSeason,
+        fieldId: crop.fieldId,
+        logIds: crop.logIds,
+        
+      }));
+
+      console.log(crops);
+      console.log("Crops fetched successfully:", crops);
+
+      // Call a function to update the UI or populate the table with fetched crops
+      updateCropTable(crops);
+    })
+    .catch((error) => {
+      console.error("Error fetching crops:", error);
+    });
+}
 
 function initValues() {
   const tableBody = document.getElementById("cropTableBody");
@@ -246,7 +286,7 @@ function deleteCrop(cropCode) {
     icon: "warning", // Warning icon
     showCancelButton: true, // Show "Cancel" button
     confirmButtonText: "Yes, delete it!", // Text for the confirmation button
-    cancelButtonText: "Cancel" // Text for the cancel button
+    cancelButtonText: "Cancel", // Text for the cancel button
   }).then((result) => {
     if (result.isConfirmed) {
       // Correctly filter the crops array using cropCode
@@ -262,27 +302,30 @@ function deleteCrop(cropCode) {
 }
 
 // Function to refresh the crop table after deletion
-function updateCropTable() {
-  const tableBody = document.getElementById("cropTableBody");
-  tableBody.innerHTML = ""; // Clear the current rows
+function updateCropTable(crops) {
+  const tableBody = document.getElementById("cropTableBody"); // Assuming a table body with this ID
+  tableBody.innerHTML = ""; // Clear existing rows
 
   crops.forEach((crop) => {
     const row = document.createElement("tr");
-    row.setAttribute("data-code", crop.cropCode); // Add data attribute for cropCode
-    row.innerHTML = generateRowHTML(
-      crop.cropCode,
-      crop.cropCommonName,
-      crop.cropScientificName,
-      crop.cropCategory,
-      crop.cropSeason,
-      crop.cropField,
-      crop.cropImage
-    );
+
+    // Create and populate cells
+    row.innerHTML = `
+      <td>${crop.cropCode}</td>
+      <td>${crop.commonName}</td>
+      <td>${crop.scientificName}</td>
+      <td><img src="data:image/png;base64,${crop.cropImage}" alt="${
+      crop.commonName
+    }" style="width: 50px; height: 50px;"></td>
+      <td>${crop.category}</td>
+      <td>${crop.cropSeason}</td>
+      <td>${crop.fieldId ? crop.fieldId : "N/A"}</td>
+      <td>${crop.logIds ? crop.logIds.join(", ") : "N/A"}</td>
+    `;
+
     tableBody.appendChild(row);
   });
 }
-
-
 
 // Search Functionality
 function searchCrop() {

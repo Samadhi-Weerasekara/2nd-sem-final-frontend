@@ -15,6 +15,8 @@ function initLogManagement() {
       observation: "Test observation",
       image: "image1.jpg",
       fields: ["Field 1", "Field 2"],
+      crops: ["Crop 1"],
+      staff: "Staff 1",
     },
     {
       code: "LOG-1002",
@@ -22,6 +24,8 @@ function initLogManagement() {
       observation: "Another observation",
       image: "image2.jpg",
       fields: ["Field 3"],
+      crops: ["Crop 2", "Crop 3"],
+      staff: "Staff 2",
     },
   ];
   updateLogTable();
@@ -34,9 +38,16 @@ function saveLog(event) {
   const code = editingLogId || `LOG-${Date.now()}`;
   const date = document.getElementById("logDate").value;
   const observation = document.getElementById("logDetails").value;
+
   const fields = Array.from(
     document.getElementById("fields").selectedOptions
   ).map((option) => option.value);
+
+  const crops = Array.from(
+    document.getElementById("crops").selectedOptions
+  ).map((option) => option.value);
+
+  const staff = document.getElementById("staff").value;
 
   // Handle image upload (this implementation assumes local image path for display)
   const imageFile = document.getElementById("observedImage").files[0];
@@ -48,10 +59,12 @@ function saveLog(event) {
     log.date = date;
     log.observation = observation;
     log.fields = fields;
+    log.crops = crops;
+    log.staff = staff;
     log.image = image;
   } else {
     // Add new log
-    logList.push({ code, date, observation, fields, image });
+    logList.push({ code, date, observation, fields, crops, staff, image });
   }
 
   editingLogId = null; // Reset editing mode
@@ -75,6 +88,8 @@ function updateLogTable() {
         log.image
       }" alt="Observed" style="width: 50px; height: 50px;" /></td>
       <td>${log.fields.join(", ")}</td>
+      <td>${log.crops.join(", ")}</td>
+      <td>${log.staff}</td>
       <td>
         <button class="btn btn-sm " onclick="editLog('${log.code}')">
            <i class="fa-solid fa-pen"></i>
@@ -102,6 +117,15 @@ function editLog(code) {
     Array.from(fieldsSelect.options).forEach((option) => {
       option.selected = log.fields.includes(option.value);
     });
+
+    // Populate crops
+    const cropsSelect = document.getElementById("crops");
+    Array.from(cropsSelect.options).forEach((option) => {
+      option.selected = log.crops.includes(option.value);
+    });
+
+    // Populate staff
+    document.getElementById("staff").value = log.staff;
 
     document.getElementById("logModalLabel").innerText = "Edit Log";
     bootstrap.Modal.getOrCreateInstance(
@@ -138,7 +162,17 @@ function searchLog() {
     const observation = row
       .querySelector("td:nth-child(3)")
       .innerText.toLowerCase();
+    const fields = row.querySelector("td:nth-child(5)").innerText.toLowerCase();
+    const crops = row.querySelector("td:nth-child(6)").innerText.toLowerCase();
+    const staff = row.querySelector("td:nth-child(7)").innerText.toLowerCase();
+
     row.style.display =
-      code.includes(query) || observation.includes(query) ? "" : "none";
+      code.includes(query) ||
+      observation.includes(query) ||
+      fields.includes(query) ||
+      crops.includes(query) ||
+      staff.includes(query)
+        ? ""
+        : "none";
   });
 }

@@ -9,7 +9,7 @@ function initEquipmentManagement() {
     .getElementById("equipmentForm")
     .addEventListener("submit", saveEquipment);
 
-  // Prepopulate table (optional, for testing/demo)
+
   equipmentList = [
     {
       id: "EQUIP-1001",
@@ -91,7 +91,6 @@ function updateEquipmentTable() {
   });
 }
 
-// Edit Equipment
 // Edit Equipment
 function editEquipment(id) {
   document.getElementById("equipmentModalLabel").innerText = "Edit Equipment";

@@ -107,8 +107,7 @@
           cancelButtonText: "No, stay logged in",
         }).then((result) => {
           if (result.isConfirmed) {
-            // Redirect to the index page after logout confirmation
-            window.location.href = '/index.html'; // Change this URL to your logout endpoint
+            window.location.href = '/index.html'; 
           }
         });
       }
