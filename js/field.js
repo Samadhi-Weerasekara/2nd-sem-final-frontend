@@ -1,4 +1,62 @@
+document.addEventListener("DOMContentLoaded", () => {
+  initValues(); // Call initValues function
+  fetchFieldsFromBackend(); // Call fetchFieldsFromBackend function
+});
+
 let editingFieldId = null; // Track the field being edited
+let fields = [];
+
+function fetchFieldsFromBackend() {
+  fetch("http://localhost:8080/api/v1/fields", {
+    // Update the endpoint to match your API for fields
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch fields");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      const fields = data.map((field) => ({
+        fieldCode: field.fieldCode,
+        fieldName: field.fieldName.trim(), // Trimming extra spaces
+        fieldLocation: field.fieldLocation, // Assuming this is a valid location format
+        extentSize: field.extentSize,
+        fieldImage1: field.fieldImage1, // Assuming it's a valid base64 string
+        fieldImage2: field.fieldImage2, // Assuming it's a valid base64 string
+      }));
+
+      console.log(fields);
+      console.log("Fields fetched successfully:", fields);
+
+      // Call a function to update the UI or populate the table with fetched fields
+      updateFieldTable(fields);
+    })
+    .catch((error) => {
+      console.error("Error fetching fields:", error);
+    });
+}
+
+
+function initValues() {
+  const tableBody = document.getElementById("fieldTableBody");
+  fields.forEach((field) => {
+    const row = document.createElement("tr");
+    row.innerHTML = generateRowHTML(
+      field.fieldId,
+      field.fieldName,
+      field.fieldLocation,
+      field.fieldExtent,
+      field.fieldImage1,
+      field.fieldImage2
+    );
+    tableBody.appendChild(row);
+  });
+}
 
 // Add Event Listener to the Form
 document.getElementById("fieldForm").addEventListener("submit", (event) => {
@@ -20,12 +78,26 @@ document.getElementById("fieldForm").addEventListener("submit", (event) => {
   if (editingFieldId) {
     // Update existing row
     const row = document.querySelector(`tr[data-id="${fieldId}"]`);
-    row.innerHTML = generateRowHTML(fieldId, fieldName, fieldLocation, fieldExtent, fieldImage1, fieldImage2);
+    row.innerHTML = generateRowHTML(
+      fieldId,
+      fieldName,
+      fieldLocation,
+      fieldExtent,
+      fieldImage1,
+      fieldImage2
+    );
   } else {
     // Add a new row
     const newRow = document.createElement("tr");
     newRow.setAttribute("data-id", fieldId);
-    newRow.innerHTML = generateRowHTML(fieldId, fieldName, fieldLocation, fieldExtent, fieldImage1, fieldImage2);
+    newRow.innerHTML = generateRowHTML(
+      fieldId,
+      fieldName,
+      fieldLocation,
+      fieldExtent,
+      fieldImage1,
+      fieldImage2
+    );
     document.getElementById("fieldTableBody").appendChild(newRow);
   }
 
@@ -38,7 +110,14 @@ document.getElementById("fieldForm").addEventListener("submit", (event) => {
 });
 
 // Generate Table Row HTML
-function generateRowHTML(fieldId, fieldName, fieldLocation, fieldExtent, fieldImage1, fieldImage2) {
+function generateRowHTML(
+  fieldId,
+  fieldName,
+  fieldLocation,
+  fieldExtent,
+  fieldImage1,
+  fieldImage2
+) {
   return `
     <td>${fieldId}</td>
     <td>${fieldName}</td>
@@ -101,9 +180,10 @@ function editField(fieldId) {
   document.getElementById("fieldImage2").value = "";
 
   // Open the modal
-  bootstrap.Modal.getOrCreateInstance(document.getElementById("fieldModal")).show();
+  bootstrap.Modal.getOrCreateInstance(
+    document.getElementById("fieldModal")
+  ).show();
 }
-
 
 function deleteField(fieldId) {
   // Show SweetAlert confirmation dialog
@@ -113,8 +193,8 @@ function deleteField(fieldId) {
     icon: "warning", // Warning icon
     showCancelButton: true, // Show "Cancel" button
     confirmButtonText: "Yes, delete it!", // Text for the confirmation button
-    cancelButtonText: "Cancel" // Text for the cancel button
-  }).then(result => {
+    cancelButtonText: "Cancel", // Text for the cancel button
+  }).then((result) => {
     if (result.isConfirmed) {
       // Remove the row from the DOM
       const row = document.querySelector(`tr[data-id="${fieldId}"]`);
@@ -127,7 +207,6 @@ function deleteField(fieldId) {
     }
   });
 }
-
 
 // Search Functionality
 function searchField() {
@@ -142,7 +221,9 @@ function searchField() {
   } else {
     // Otherwise, filter rows based on the query
     rows.forEach((row) => {
-      const fieldName = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
+      const fieldName = row
+        .querySelector("td:nth-child(2)")
+        .innerText.toLowerCase();
       row.style.display = fieldName.includes(query) ? "" : "none";
     });
   }
@@ -160,4 +241,23 @@ function previewImage(inputId, previewId) {
     };
     reader.readAsDataURL(fileInput.files[0]);
   }
+}
+// Function to update the field table
+function updateFieldTable(fields) {
+  const tableBody = document.getElementById("fieldTableBody");
+  tableBody.innerHTML = ""; // Clear existing rows
+
+  fields.forEach((field) => {
+    const row = document.createElement("tr");
+    row.setAttribute("data-id", field.fieldCode); // Use fieldCode as ID for the row
+    row.innerHTML = generateRowHTML(
+      field.fieldCode,
+      field.fieldName,
+      field.fieldLocation,
+      field.extentSize,
+      field.fieldImage1,
+      field.fieldImage2
+    );
+    tableBody.appendChild(row);
+  });
 }
