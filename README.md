@@ -1,5 +1,6 @@
-
+<div align="center">
  <img src="assests\Green__1_-removebg-preview.png" width="200" height="200" />
+ </div>
 # Green Shadow (Pvt) Ltd. Agricultural Management System - Frontend
 
 ## Description
@@ -64,17 +65,13 @@ Custom exceptions are designed to address specific error situations, delivering 
 
 ## UI examples
 
-![Login Page](assests\login.png)
-
-![Dashboard](assests\Screenshot 2024-12-05 165115.png)
-
-![save crop](assests\Screenshot 2024-12-05 165145.png)
-
-![update crop](assests\Screenshot 2024-12-05 165319.png)
-
-![table view](assests\Screenshot 2024-12-05 165253.png)
-
-![delete crop](assests\Screenshot 2024-12-05 165300.png)
+ <img src="assests\login.png" width="400" height="400" />
+ <img src="assests\Screenshot 2024-12-05 165115.png"  width="400" height="400"/>
+ <img src="assests\Screenshot 2024-12-05 165145.png" width="400" height="400" />
+ <img src="assests\Screenshot 2024-12-05 165253.png" width="400" height="400" />
+ <img src="assests\Screenshot 2024-12-05 165300.png" width="400" height="400" />
+  <img src="assests\Screenshot 2024-12-05 165319.png" width="400" height="400" />
+ 
 
 ## API Documentation
 
@@ -86,3 +83,7 @@ Refer to the [ Postman API Documentation](https://documenter.getpostman.com/view
 ## License
 
 This project is licensed under the MIT License - see the [ MIT License](https://github.com/Samadhi-Weerasekara/2nd-sem-final-frontend) file for details.
+
+<p align="center">
+  &copy; 2024 Samadhi Weerasekara
+</p>
