@@ -66,13 +66,12 @@ Custom exceptions are designed to address specific error situations, delivering 
 ## UI examples
 
  <img src="assests\login.png" width="400" height="400" />
- <img src="assests\Screenshot 2024-12-05 165115.png"  width="400" height="400"/>
- <img src="assests\Screenshot 2024-12-05 165145.png" width="400" height="400" />
- <img src="assests\Screenshot 2024-12-05 165253.png" width="400" height="400" />
- <img src="assests\Screenshot 2024-12-05 165300.png" width="400" height="400" />
-  <img src="assests\Screenshot 2024-12-05 165319.png" width="400" height="400" />
+ <img src="assests\Screenshot 2024-12-05 165115.png"  width="400" height="600"/>
+ <img src="assests\Screenshot 2024-12-05 165145.png" width="400" height="600" />
+ <img src="assests\Screenshot 2024-12-05 165253.png" width="400" height="600" />
+ <img src="assests\Screenshot 2024-12-05 165300.png" width="400" height="600" />
+ <img src="assests\Screenshot 2024-12-05 165319.png" width="400" height="600" />
  
-
 ## API Documentation
 
 To view this project API Documentation
