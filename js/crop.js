@@ -1,123 +1,68 @@
 document.addEventListener("DOMContentLoaded", () => {
-  initValues();
   fetchCropsFromBackend();
+
+  // Manage modal focus and background element tabindex
+  $('#cropModal').on('shown.bs.modal', function () {
+    $(this).find('button, [href], input, select, textarea').first().focus();
+    $('.background-elements').attr('tabindex', '-1');
+  });
+
+  $('#cropModal').on('hidden.bs.modal', function () {
+    $('.background-elements').removeAttr('tabindex');
+    resetForm();
+  });
 });
+
 let editingCropCode = null; // Track the crop being edited
 let crops = [];
 
-function fetchCropsFromBackend() {
-  fetch("http://localhost:8080/api/v1/staff/allstaff", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to fetch crops");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      const crops = data.map((crop) => ({
-        cropCode: crop.cropCode,
-        commonName: crop.commonName.trim(), // Trimming extra spaces
-        scientificName: crop.scientificName.trim(), // Trimming extra spaces
-        cropImage: crop.cropImage, // Assuming it's a valid base64 string
-        category: crop.category,
-        cropSeason: crop.cropSeason,
-        fieldId: crop.fieldId,
-      }));
+// Fetch crops from the backend
+async function fetchCropsFromBackend() {
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("No auth token found");
+    }
+    console.log("Token from localStorage:", token);
 
-      console.log(crops);
-      console.log("Crops fetched successfully:", crops);
-
-      // Call a function to update the UI or populate the table with fetched crops
-      updateCropTable(crops);
-    })
-    .catch((error) => {
-      console.error("Error fetching crops:", error);
+    const response = await axios.get("http://localhost:8080/api/v1/crops", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
     });
+
+    console.log("Data fetched from backend:", response.data);
+    crops = [];
+    crops.push(...response.data);
+    initValues();
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
 }
 
+// Initialize table values
 function initValues() {
   const tableBody = document.getElementById("cropTableBody");
+  tableBody.innerHTML = "";
+
   crops.forEach((crop) => {
     const row = document.createElement("tr");
     row.innerHTML = generateRowHTML(
       crop.cropCode,
-      crop.cropCommonName,
-      crop.cropScientificName,
-      crop.cropCategory,
+      crop.commonName,
+      crop.scientificName,
+      crop.category,
       crop.cropSeason,
-      crop.cropField,
-      crop.cropImage
+      crop.fieldId,
+      base64ToImage(crop.cropImage)
     );
     tableBody.appendChild(row);
   });
 }
-// Add Event Listener to the Form
-document.getElementById("cropForm").addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const cropCode = editingCropCode || `CROP-${Date.now()}`; // Use existing code if editing, else generate a unique code
-  const cropCommonName = document.getElementById("cropCommonName").value;
-  const cropScientificName =
-    document.getElementById("cropScientificName").value;
-  const cropCategory = document.getElementById("cropCategory").value;
-  const cropSeason = document.getElementById("cropSeason").value;
-  const cropField = document.getElementById("cropField").value;
-
-  // Get image data
-  const cropImage = document.getElementById("cropImage").files[0]
-    ? document.getElementById("previewCropImage").src
-    : "";
-
-  if (editingCropCode) {
-    // Update existing row
-    const row = document.querySelector(`tr[data-code="${cropCode}"]`);
-    row.innerHTML = generateRowHTML(
-      cropCode,
-      cropCommonName,
-      cropScientificName,
-      cropCategory,
-      cropSeason,
-      cropField,
-      cropImage
-    );
-  } else {
-    // Add a new row
-    const newRow = document.createElement("tr");
-    newRow.setAttribute("data-code", cropCode);
-    newRow.innerHTML = generateRowHTML(
-      cropCode,
-      cropCommonName,
-      cropScientificName,
-      cropCategory,
-      cropSeason,
-      cropField,
-      cropImage
-    );
-    document.getElementById("cropTableBody").appendChild(newRow);
-  }
-
-  // Reset the form and close the modal
-  document.getElementById("cropForm").reset();
-  document.getElementById("previewCropImage").style.display = "none";
-  editingCropCode = null;
-  bootstrap.Modal.getInstance(document.getElementById("cropModal")).hide();
-});
 
 // Generate Table Row HTML
-function generateRowHTML(
-  cropCode,
-  commonName,
-  scientificName,
-  category,
-  season,
-  field,
-  image
-) {
+function generateRowHTML(cropCode, commonName, scientificName, category, season, field, image) {
   return `
     <td>${cropCode}</td>
     <td>${commonName}</td>
@@ -127,138 +72,187 @@ function generateRowHTML(
     <td>${field}</td>
     <td><img src="${image}" alt="Crop Image" style="width: 100px; height: auto;"></td>
     <td>
-      <button class="btn  btn-sm" onclick="editCrop('${cropCode}')"><i class="fa-solid fa-pen"></i></button>
-      <button class="btn  btn-sm" onclick="deleteCrop('${cropCode}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></button>
+      <button class="btn btn-sm" onclick="editCrop('${cropCode}')"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn btn-sm" onclick="deleteCrop('${cropCode}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></button>
     </td>
   `;
 }
 
-// Open Add Crop Modal
-function openAddCropModal() {
-  editingCropCode = null; // Clear editing mode
-  document.getElementById("cropForm").reset();
-  document.getElementById("cropModalLabel").innerText = "Add Crop";
-
-  // Reset image preview
-  document.getElementById("previewCropImage").style.display = "none";
+// Convert base64 image to HTML Image element
+function base64ToImage(base64String) {
+  return `data:image/jpeg;base64,${base64String}`;
 }
+
+// Add/Edit Crop Form Submit
+document.getElementById("cropForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const cropCode = editingCropCode || `CROP-${Date.now()}`;
+  const cropCommonName = document.getElementById("cropCommonName").value;
+  const cropScientificName = document.getElementById("cropScientificName").value;
+  const cropCategory = document.getElementById("cropCategory").value;
+  const cropSeason = document.getElementById("cropSeason").value;
+  const cropField = document.getElementById("cropField").value;
+  const cropImage = document.getElementById("cropImage").files[0];
+
+  const formData = new FormData();
+  formData.append("commonName", cropCommonName);
+  formData.append("scientificName", cropScientificName);
+  if (cropImage) formData.append("cropImage", cropImage); // Only append if there's an image
+  formData.append("category", cropCategory);
+  formData.append("cropSeason", cropSeason);
+
+  try {
+    const token = localStorage.getItem("authToken");
+    let response;
+
+    if (editingCropCode) {
+      // Update existing crop
+      response = await axios.put(
+        `http://localhost:8080/api/v1/crops/${editingCropCode}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+    } else {
+      // Create new crop
+      response = await axios.post("http://localhost:8080/api/v1/crops", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    }
+
+    // Handle response based on the operation
+    if (response.status === 201) {
+      // Success on create
+      Swal.fire({
+        title: "Success",
+        text: "Crop created successfully",
+        icon: "success",
+        confirmButtonText: "OK",
+      }).then(() => {
+        fetchCropsFromBackend(); // Refresh the table
+        bootstrap.Modal.getInstance(document.getElementById("cropModal")).hide(); // Close the modal
+      });
+    } else if (response.status === 204) {
+      // Success on update
+      Swal.fire({
+        title: "Success",
+        text: "Crop updated successfully",
+        icon: "success",
+        confirmButtonText: "OK",
+      }).then(() => {
+        fetchCropsFromBackend(); // Refresh the table
+        bootstrap.Modal.getInstance(document.getElementById("cropModal")).hide(); // Close the modal
+      });
+    }
+  } catch (error) {
+    Swal.fire("Error", "An error occurred while saving the crop data", "error");
+    console.error("Error:", error);
+  }
+});
 
 // Edit Crop
 function editCrop(cropCode) {
-  editingCropCode = cropCode; // Set the editing code
-  const row = document.querySelector(`tr[data-code="${cropCode}"]`);
-  const cells = row.querySelectorAll("td");
+  const crop = crops.find((item) => item.cropCode === cropCode);
+  if (crop) {
+    document.getElementById("cropCommonName").value = crop.commonName;
+    document.getElementById("cropScientificName").value = crop.scientificName;
+    document.getElementById("cropCategory").value = crop.category;
+    document.getElementById("cropSeason").value = crop.cropSeason;
+    document.getElementById("cropField").value = crop.fieldId;
+    document.getElementById("previewCropImage").style.display = "block";
+    document.getElementById("previewCropImage").src = base64ToImage(crop.cropImage);
 
-  // Populate the modal fields
-  document.getElementById("cropModalLabel").innerText = "Edit Crop";
-  document.getElementById("cropCommonName").value = cells[1].innerText; // Common Name
-  document.getElementById("cropScientificName").value = cells[2].innerText; // Scientific Name
-  document.getElementById("cropCategory").value = cells[3].innerText; // Category
-  document.getElementById("cropSeason").value = cells[4].innerText; // Season
-  document.getElementById("cropField").value = cells[5].innerText; // Field
-
-  // Load existing image preview
-  const image = cells[6].querySelector("img").src;
-  const previewImage = document.getElementById("previewCropImage");
-
-  if (image) {
-    previewImage.src = image;
-    previewImage.style.display = "block";
+    editingCropCode = cropCode;
+    document.getElementById("cropModalLabel").textContent = "Edit Crop";
+    const cropModal = new bootstrap.Modal(document.getElementById("cropModal"));
+    cropModal.show();
   } else {
-    previewImage.style.display = "none";
+    console.error("Crop with code", cropCode, "not found.");
   }
-
-  // Clear file input (optional for new uploads)
-  document.getElementById("cropImage").value = "";
-
-  // Open the modal
-  bootstrap.Modal.getOrCreateInstance(
-    document.getElementById("cropModal")
-  ).show();
 }
 
-function deleteCrop(cropCode) {
-  Swal.fire({
-    title: "Are you sure?", // Confirmation title
-    text: "Do you really want to delete this crop?", // Confirmation message
-    icon: "warning", // Warning icon
-    showCancelButton: true, // Show "Cancel" button
-    confirmButtonText: "Yes, delete it!", // Text for the confirmation button
-    cancelButtonText: "Cancel", // Text for the cancel button
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Correctly filter the crops array using cropCode
-      crops = crops.filter((crop) => crop.cropCode !== cropCode);
+// Delete Crop
+async function deleteCrop(cropCode) {
+  const confirmation = await Swal.fire({
+    title: "Are you sure?",
+    text: "This will delete the crop permanently!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it!",
+  });
 
-      // Refresh the crop table
-      updateCropTable();
-
-      // Display success message
-      Swal.fire("Deleted!", "The crop has been deleted.", "success");
+  if (confirmation.isConfirmed) {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.delete(
+        `http://localhost:8080/api/v1/crops/${cropCode}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.status === 204) {
+        Swal.fire("Deleted", "Crop deleted successfully", "success");
+        fetchCropsFromBackend();
+      }
+    } catch (error) {
+      Swal.fire("Error", "An error occurred while deleting the crop", "error");
+      console.error("Error:", error);
     }
-  });
+  }
 }
 
-// Function to refresh the crop table after deletion
-function updateCropTable(crops) {
-  const tableBody = document.getElementById("cropTableBody"); // Assuming a table body with this ID
-  tableBody.innerHTML = ""; // Clear existing rows
+// Image Preview Before Upload
+document.getElementById("cropImage").addEventListener("change", function (event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      document.getElementById("previewCropImage").src = reader.result;
+      document.getElementById("previewCropImage").style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+});
 
-  crops.forEach((crop) => {
-    const row = document.createElement("tr");
-
-    // Create and populate cells
-    row.innerHTML = `
-      <td>${crop.cropCode}</td>
-      <td>${crop.commonName}</td>
-      <td>${crop.scientificName}</td>
-      <td><img src="data:image/png;base64,${crop.cropImage}" alt="${
-      crop.commonName
-    }" style="width: 50px; height: 50px;"></td>
-      <td>${crop.category}</td>
-      <td>${crop.cropSeason}</td>
-      <td>${crop.fieldId ? crop.fieldId : "N/A"}</td>       <td>
-      <button class="btn  btn-sm" onclick="editCrop('${cropCode}')"><i class="fa-solid fa-pen"></i></button>
-      <button class="btn  btn-sm" onclick="deleteCrop('${cropCode}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></button>
-    </td>
-    `;
-
-    tableBody.appendChild(row);
-  });
+// Reset the form fields and editingCropCode
+function resetForm() {
+  editingCropCode = null;
+  document.getElementById("cropForm").reset();
+  document.getElementById("previewCropImage").style.display = "none"; // Hide the preview
 }
 
 // Search Functionality
 function searchCrop() {
-  const query = document.getElementById("searchCrop").value.toLowerCase();
-  const rows = document.querySelectorAll("#cropTableBody tr");
+  const searchTerm = document.getElementById("searchCrop").value.toLowerCase();
+  const filteredCrops = crops.filter(
+    (crop) =>
+      crop.commonName.toLowerCase().includes(searchTerm) ||
+      crop.scientificName.toLowerCase().includes(searchTerm)
+  );
 
-  if (query.trim() === "") {
-    // If the search bar is empty, show all rows
-    rows.forEach((row) => {
-      row.style.display = "";
-    });
-  } else {
-    // Otherwise, filter rows based on the query
-    rows.forEach((row) => {
-      const commonName = row
-        .querySelector("td:nth-child(2)")
-        .innerText.toLowerCase();
-      row.style.display = commonName.includes(query) ? "" : "none";
-    });
-  }
-}
-
-// Preview Image
-function previewImage(inputId, previewId) {
-  const fileInput = document.getElementById(inputId);
-  const preview = document.getElementById(previewId);
-
-  if (fileInput.files && fileInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      preview.src = e.target.result;
-      preview.style.display = "block";
-    };
-    reader.readAsDataURL(fileInput.files[0]);
-  }
+  const tableBody = document.getElementById("cropTableBody");
+  tableBody.innerHTML = ""; // Clear the table
+  filteredCrops.forEach((crop) => {
+    const row = document.createElement("tr");
+    row.innerHTML = generateRowHTML(
+      crop.cropCode,
+      crop.commonName,
+      crop.scientificName,
+      crop.category,
+      crop.cropSeason,
+      crop.fieldId,
+      base64ToImage(crop.cropImage)
+    );
+    tableBody.appendChild(row);
+  });
 }

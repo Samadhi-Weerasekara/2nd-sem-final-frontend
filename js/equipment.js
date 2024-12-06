@@ -36,7 +36,11 @@ function fetchEquipmentFromBackend() {
     })
     .catch((error) => {
       console.error("Error fetching equipment data:", error);
-      Swal.fire("Error", "Unable to fetch equipment data from the backend.", "error");
+      Swal.fire(
+        "Error",
+        "Unable to fetch equipment data from the backend.",
+        "error"
+      );
     });
 }
 
@@ -49,6 +53,10 @@ function initEquipmentManagement() {
   document.getElementById("addEquipmentBtn").addEventListener("click", () => {
     editingEquipmentId = null; // Reset editing mode
     document.getElementById("equipmentForm").reset(); // Clear form fields
+    currentVehicleId = null; // Reset the currentVehicleId after saving
+    vehicleForm.reset(); // Reset the form
+    vehicleModal.hide(); // Hide the modal
+
     document.getElementById("equipmentModalLabel").innerText = "Add Equipment"; // Set modal title
   });
 }
@@ -66,7 +74,9 @@ function saveEquipment(event) {
 
   if (editingEquipmentId) {
     // Update existing equipment
-    const equipment = equipmentList.find((item) => item.id === editingEquipmentId);
+    const equipment = equipmentList.find(
+      (item) => item.id === editingEquipmentId
+    );
     Object.assign(equipment, { name, type, status, staff, field });
   } else {
     // Add new equipment
@@ -119,7 +129,9 @@ function editEquipment(id) {
     document.getElementById("assignedStaff").value = equipment.staff;
     document.getElementById("assignedField").value = equipment.field;
 
-    bootstrap.Modal.getOrCreateInstance(document.getElementById("equipmentModal")).show();
+    bootstrap.Modal.getOrCreateInstance(
+      document.getElementById("equipmentModal")
+    ).show();
   }
 }
 
@@ -149,6 +161,7 @@ function searchEquipment() {
   rows.forEach((row) => {
     const id = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
     const name = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
-    row.style.display = id.includes(query) || name.includes(query) ? "" : "none";
+    row.style.display =
+      id.includes(query) || name.includes(query) ? "" : "none";
   });
 }

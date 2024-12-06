@@ -1,178 +1,46 @@
-document.addEventListener("DOMContentLoaded", initLogManagement);
 
-let logList = []; // Stores all log data
-let editingLogId = null; // Tracks the ID of the log being edited
 
-function initLogManagement() {
-  // Add event listener to the form
-  document.getElementById("logForm").addEventListener("submit", saveLog);
-
-  // Sample data (optional, for testing/demo)
-  logList = [
-    {
-      code: "LOG-1001",
-      date: "2024-01-01",
-      observation: "Test observation",
-      image: "image1.jpg",
-      fields: ["Field 1", "Field 2"],
-      crops: ["Crop 1"],
-      staff: "Staff 1",
-    },
-    {
-      code: "LOG-1002",
-      date: "2024-02-01",
-      observation: "Another observation",
-      image: "image2.jpg",
-      fields: ["Field 3"],
-      crops: ["Crop 2", "Crop 3"],
-      staff: "Staff 2",
-    },
-  ];
-  updateLogTable();
-}
-
-// Save or Update Log
-function saveLog(event) {
-  event.preventDefault();
-
-  const code = editingLogId || `LOG-${Date.now()}`;
-  const date = document.getElementById("logDate").value;
-  const observation = document.getElementById("logDetails").value;
-
-  const fields = Array.from(
-    document.getElementById("fields").selectedOptions
-  ).map((option) => option.value);
-
-  const crops = Array.from(
-    document.getElementById("crops").selectedOptions
-  ).map((option) => option.value);
-
-  const staff = document.getElementById("staff").value;
-
-  // Handle image upload (this implementation assumes local image path for display)
-  const imageFile = document.getElementById("observedImage").files[0];
-  const image = imageFile ? URL.createObjectURL(imageFile) : null;
-
-  if (editingLogId) {
-    // Update existing log
-    const log = logList.find((item) => item.code === editingLogId);
-    log.date = date;
-    log.observation = observation;
-    log.fields = fields;
-    log.crops = crops;
-    log.staff = staff;
-    log.image = image;
-  } else {
-    // Add new log
-    logList.push({ code, date, observation, fields, crops, staff, image });
-  }
-
-  editingLogId = null; // Reset editing mode
-  document.getElementById("logForm").reset(); // Clear form
-  bootstrap.Modal.getInstance(document.getElementById("logModal")).hide(); // Hide modal
-  updateLogTable(); // Refresh table
-}
-
-// Update Log Table
-function updateLogTable() {
-  const tableBody = document.getElementById("logTableBody");
-  tableBody.innerHTML = ""; // Clear table
-
-  logList.forEach((log) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${log.code}</td>
-      <td>${log.date}</td>
-      <td>${log.observation}</td>
-      <td><img src="${
-        log.image
-      }" alt="Observed" style="width: 50px; height: 50px;" /></td>
-      <td>${log.fields.join(", ")}</td>
-      <td>${log.crops.join(", ")}</td>
-      <td>${log.staff}</td>
-      <td>
-        <button class="btn btn-sm " onclick="editLog('${log.code}')">
-           <i class="fa-solid fa-pen"></i>
-        </button>
-        <button class="btn btn-sm " onclick="deleteLog('${log.code}')">
-          <i class="fa-solid fa-trash" style="color: #e9542f;"></i>
-        </button>
-      </td>
-    `;
-    tableBody.appendChild(row);
+function loadLogs() {
+  $(document).ready(function () {
+    loadLogs(); // Fetch logs when the document is ready
   });
-}
 
-// Edit Log
-function editLog(code) {
-  editingLogId = code; // Set editing mode
-  const log = logList.find((item) => item.code === code);
-
-  if (log) {
-    document.getElementById("logDate").value = log.date;
-    document.getElementById("logDetails").value = log.observation;
-
-    // Populate fields
-    const fieldsSelect = document.getElementById("fields");
-    Array.from(fieldsSelect.options).forEach((option) => {
-      option.selected = log.fields.includes(option.value);
+  function loadLogs() {
+    $.ajax({
+      url: "http://localhost:8080/api/v1/logs",
+      type: "GET",
+      success: function (data) {
+        console.log('Data from server:', data); // Log the data received from the backend
+  
+        // Populate the log table with data
+        $("#logTableBody").empty(); // Clear existing rows
+  
+        data.forEach(function (log) {
+          const fields = log.fieldId ? log.fieldId : "N/A"; // Update to use fieldId
+          const crops = log.cropId ? log.cropId : "N/A"; // Update to use cropId
+  
+          $("#logTableBody").append(`
+            <tr>
+              <td>${log.logCode}</td>         <!-- Update logCode -->
+              <td>${log.logDate}</td>         <!-- Update logDate -->
+              <td>${log.logDetails}</td>      <!-- Update logDetails -->
+              <td><img src="${log.observedImage}" alt="Observed" width="50" /></td>
+              <td>${fields}</td>              <!-- Update fields -->
+              <td>${crops}</td>               <!-- Update crops -->
+              <td>${log.staffId}</td>         <!-- Update staffId -->
+              <td>
+                <button class="btn btn-sm" onclick="editCrop('${log.logCode}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-sm" onclick="deleteCrop('${log.logCode}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></button>
+              </td>
+            </tr>
+          `);
+        });
+      },
+      error: function (xhr, status, error) {
+        console.error("Failed to fetch logs:", error); // Log error details
+        Swal.fire("Error!", "Failed to load logs: " + error, "error"); // Show error alert
+      },
     });
-
-    // Populate crops
-    const cropsSelect = document.getElementById("crops");
-    Array.from(cropsSelect.options).forEach((option) => {
-      option.selected = log.crops.includes(option.value);
-    });
-
-    // Populate staff
-    document.getElementById("staff").value = log.staff;
-
-    document.getElementById("logModalLabel").innerText = "Edit Log";
-    bootstrap.Modal.getOrCreateInstance(
-      document.getElementById("logModal")
-    ).show(); // Show modal
   }
-}
-
-// Delete Log
-function deleteLog(code) {
-  Swal.fire({
-    title: "Are you sure?",
-    text: "Do you really want to delete this log?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Yes, delete it!",
-    cancelButtonText: "Cancel",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      logList = logList.filter((item) => item.code !== code);
-      updateLogTable();
-      Swal.fire("Deleted!", "The log has been deleted.", "success");
-    }
-  });
-}
-
-// Search Log
-function searchLog() {
-  const query = document.getElementById("searchLog").value.toLowerCase();
-  const rows = document.querySelectorAll("#logTableBody tr");
-
-  rows.forEach((row) => {
-    const code = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
-    const observation = row
-      .querySelector("td:nth-child(3)")
-      .innerText.toLowerCase();
-    const fields = row.querySelector("td:nth-child(5)").innerText.toLowerCase();
-    const crops = row.querySelector("td:nth-child(6)").innerText.toLowerCase();
-    const staff = row.querySelector("td:nth-child(7)").innerText.toLowerCase();
-
-    row.style.display =
-      code.includes(query) ||
-      observation.includes(query) ||
-      fields.includes(query) ||
-      crops.includes(query) ||
-      staff.includes(query)
-        ? ""
-        : "none";
-  });
+  
 }

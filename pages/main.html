@@ -17,6 +17,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/main.css" />
+    <link rel="icon" href="/assests/Green__1_-removebg-preview.png" />
     <style>
       iframe {
         border: none;
@@ -28,14 +29,26 @@
   <body>
     <div class="row">
       <div class="sidebar col-2">
-        <div class="logo d-flex flex-column align-items-center" style="padding: 0;">
-          <img src="/assests/Green__1_-removebg-preview.png" alt="Green Shadow Logo" class="img-fluid" style="max-width: 120px;">
+        <div
+          class="logo d-flex flex-column align-items-center"
+          style="padding: 0"
+        >
+          <img
+            src="/assests/Green__1_-removebg-preview.png"
+            alt="Green Shadow Logo"
+            class="img-fluid"
+            style="max-width: 120px"
+          />
         </div>
-        
+
         <nav>
           <ul>
             <li>
-              <a href="#" onclick="loadPage(this, '/pages/dashboard.html')" class="active">
+              <a
+                href="#"
+                onclick="loadPage(this, '/pages/dashboard.html')"
+                class="active"
+              >
                 <i class="fas fa-home"></i> Dashboard
               </a>
             </li>
@@ -70,22 +83,32 @@
               </a>
             </li>
             <li>
-              <a href="#" onclick="loadPage(this, '/pages/monitorLogPage.html')">
+              <a
+                href="#"
+                onclick="loadPage(this, '/pages/monitorLogPage.html')"
+              >
                 <i class="fas fa-clipboard-list"></i> Monitor Logs
               </a>
             </li>
           </ul>
         </nav>
         <div class="logout">
-          <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          <a href="#" onclick="confirmLogout()"
+            ><i class="fas fa-sign-out-alt"></i> Logout</a
+          >
         </div>
       </div>
-      <div class="col-10" style="padding: 0;">
+      <div class="col-10" style="padding: 0">
         <iframe id="content-frame" src="/pages/dashboard.html"></iframe>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
     <script>
       function loadPage(element, pageUrl) {
         // Update the iframe source
@@ -107,10 +130,11 @@
           cancelButtonText: "No, stay logged in",
         }).then((result) => {
           if (result.isConfirmed) {
-            window.location.href = '/index.html'; 
+            window.location.href = "/index.html";
           }
         });
       }
     </script>
+    <script src="/js/autologout.js"></script>
   </body>
 </html>
