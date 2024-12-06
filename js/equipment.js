@@ -1,167 +1,216 @@
 document.addEventListener("DOMContentLoaded", () => {
-  initEquipmentManagement();
   fetchEquipmentFromBackend();
+
+  // Manage modal focus and background element tabindex
+  $('#equipmentModal').on('shown.bs.modal', function () {
+    $(this).find('button, [href], input, select, textarea').first().focus();
+    $('.background-elements').attr('tabindex', '-1');
+  });
+
+  $('#equipmentModal').on('hidden.bs.modal', function () {
+    $('.background-elements').removeAttr('tabindex');
+    resetForm();
+  });
 });
 
-let equipmentList = []; // Stores all equipment data
-let editingEquipmentId = null; // Tracks the ID of the equipment being edited
+let editingEquipmentId = null; // Track the equipment being edited
+let equipmentList = [];
 
 // Fetch equipment data from the backend
-function fetchEquipmentFromBackend() {
-  fetch("http://localhost:8080/api/v1/equipments/allEquipments", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        console.error("Response Status:", response.status);
-        throw new Error("Failed to fetch equipment data");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      // Transform backend data to match frontend expectations
-      equipmentList = data.map((equipment) => ({
-        id: equipment.equipmentId, // Map equipmentId to id
-        name: equipment.name,
-        type: equipment.type,
-        status: equipment.status,
-        staff: equipment.staffIds ? equipment.staffIds.join(", ") : "N/A",
-        field: equipment.fieldIds ? equipment.fieldIds.join(", ") : "N/A",
-      }));
-
-      updateEquipmentTable(); // Refresh the table
-    })
-    .catch((error) => {
-      console.error("Error fetching equipment data:", error);
-      Swal.fire(
-        "Error",
-        "Unable to fetch equipment data from the backend.",
-        "error"
-      );
+async function fetchEquipmentFromBackend() {
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("No auth token found");
+    }
+    console.log("Token from localStorage:", token);
+    const response = await axios.get("http://localhost:8080/api/v1/equipments/allEquipments", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
     });
-}
 
-// Initialize equipment management UI
-function initEquipmentManagement() {
-  document
-    .getElementById("equipmentForm")
-    .addEventListener("submit", saveEquipment);
-
-  document.getElementById("addEquipmentBtn").addEventListener("click", () => {
-    editingEquipmentId = null; // Reset editing mode
-    document.getElementById("equipmentForm").reset(); // Clear form fields
-    currentVehicleId = null; // Reset the currentVehicleId after saving
-    vehicleForm.reset(); // Reset the form
-    vehicleModal.hide(); // Hide the modal
-
-    document.getElementById("equipmentModalLabel").innerText = "Add Equipment"; // Set modal title
-  });
-}
-
-// Save or Update Equipment
-function saveEquipment(event) {
-  event.preventDefault();
-
-  const id = editingEquipmentId || `EQUIP-${Date.now()}`;
-  const name = document.getElementById("equipmentName").value;
-  const type = document.getElementById("equipmentType").value;
-  const status = document.getElementById("status").value;
-  const staff = document.getElementById("assignedStaff").value || "N/A";
-  const field = document.getElementById("assignedField").value || "N/A";
-
-  if (editingEquipmentId) {
-    // Update existing equipment
-    const equipment = equipmentList.find(
-      (item) => item.id === editingEquipmentId
-    );
-    Object.assign(equipment, { name, type, status, staff, field });
-  } else {
-    // Add new equipment
-    equipmentList.push({ id, name, type, status, staff, field });
+    equipmentList = response.data;
+    initValues();
+  } catch (error) {
+    console.error("Error fetching equipment data:", error);
   }
-
-  editingEquipmentId = null; // Reset editing mode
-  document.getElementById("equipmentForm").reset(); // Clear form
-  bootstrap.Modal.getInstance(document.getElementById("equipmentModal")).hide(); // Hide modal
-  updateEquipmentTable(); // Refresh table
 }
 
-// Update Equipment Table
-function updateEquipmentTable() {
+// Initialize table values
+function initValues() {
   const tableBody = document.getElementById("equipmentTableBody");
-  tableBody.innerHTML = ""; // Clear table
+  tableBody.innerHTML = "";
 
   equipmentList.forEach((equipment) => {
     const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${equipment.id}</td>
-      <td>${equipment.name}</td>
-      <td>${equipment.type}</td>
-      <td>${equipment.status}</td>
-      <td>${equipment.staff}</td>
-      <td>${equipment.field}</td>
-      <td>
-        <button class="btn btn-sm" onclick="editEquipment('${equipment.id}')">
-          <i class="fa-solid fa-pen"></i>
-        </button>
-        <button class="btn btn-sm" onclick="deleteEquipment('${equipment.id}')">
-          <i class="fa-solid fa-trash" style="color: #e9542f;"></i>
-        </button>
-      </td>
-    `;
+    row.innerHTML = generateRowHTML(
+      equipment.equipmentId,
+      equipment.name,
+      equipment.type,
+      equipment.status,
+      equipment.staffIds || "N/A",
+      equipment.fieldIds || "N/A"
+    );
     tableBody.appendChild(row);
   });
 }
 
-// Edit Equipment
-function editEquipment(id) {
-  document.getElementById("equipmentModalLabel").innerText = "Edit Equipment";
-  editingEquipmentId = id;
+// Generate Table Row HTML
+function generateRowHTML(id, name, type, status, staff, field) {
+  return `
+    <td>${id}</td>
+    <td>${name}</td>
+    <td>${type}</td>
+    <td>${status}</td>
+    <td>${staff}</td>
+    <td>${field}</td>
+    <td>
+      <button class="btn btn-sm" onclick="editEquipment('${id}')">
+        <i class="fa-solid fa-pen"></i>
+      </button>
+      <button class="btn btn-sm" onclick="deleteEquipment('${id}')">
+        <i class="fa-solid fa-trash" style="color: #e9542f;"></i>
+      </button>
+    </td>
+  `;
+}
 
-  const equipment = equipmentList.find((item) => item.id === id);
+// Add/Edit Equipment Form Submit
+document.getElementById("equipmentForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const equipmentId = editingEquipmentId || `EQUIPMENT-${Date.now()}`;
+  const name = document.getElementById("equipmentName").value;
+  const type = document.getElementById("equipmentType").value;
+  const status = document.getElementById("status").value;
+  const staff = document.getElementById("assignedStaff").value;
+  const field = document.getElementById("assignedField").value;
+
+  const payload = {
+    equipmentId,
+    name,
+    type,
+    status,
+    fieldIds: field || null,
+    staffIds: staff || null
+  };
+
+  try {
+    const token = localStorage.getItem("authToken");
+    let response;
+
+    if (editingEquipmentId) {
+      // Update existing equipment
+      response = await axios.put(
+        `http://localhost:8080/api/v1/equipments/${editingEquipmentId}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } else {
+      // Create new equipment
+      response = await axios.post("http://localhost:8080/api/v1/equipments", payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    }
+
+    if (response.status === 201 || response.status === 204) {
+      Swal.fire("Success", "Equipment saved successfully", "success").then(() => {
+        fetchEquipmentFromBackend();
+        bootstrap.Modal.getInstance(document.getElementById("equipmentModal")).hide();
+      });
+    }
+  } catch (error) {
+    Swal.fire("Error", "An error occurred while saving the equipment data", "error");
+    console.error("Error:", error);
+  }
+});
+
+// Edit Equipment
+function editEquipment(equipmentId) {
+  const equipment = equipmentList.find((item) => item.equipmentId === equipmentId);
   if (equipment) {
     document.getElementById("equipmentName").value = equipment.name;
     document.getElementById("equipmentType").value = equipment.type;
     document.getElementById("status").value = equipment.status;
-    document.getElementById("assignedStaff").value = equipment.staff;
-    document.getElementById("assignedField").value = equipment.field;
+    document.getElementById("assignedStaff").value = equipment.staffIds || "";
+    document.getElementById("assignedField").value = equipment.fieldIds || "";
 
-    bootstrap.Modal.getOrCreateInstance(
-      document.getElementById("equipmentModal")
-    ).show();
+    editingEquipmentId = equipmentId;
+    document.getElementById("equipmentModalLabel").textContent = "Edit Equipment";
+    const equipmentModal = new bootstrap.Modal(document.getElementById("equipmentModal"));
+    equipmentModal.show();
+  } else {
+    console.error("Equipment with ID", equipmentId, "not found.");
   }
 }
 
 // Delete Equipment
-function deleteEquipment(id) {
-  Swal.fire({
+async function deleteEquipment(equipmentId) {
+  const confirmation = await Swal.fire({
     title: "Are you sure?",
-    text: "Do you really want to delete this equipment?",
+    text: "This will delete the equipment permanently!",
     icon: "warning",
     showCancelButton: true,
     confirmButtonText: "Yes, delete it!",
-    cancelButtonText: "Cancel",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      equipmentList = equipmentList.filter((item) => item.id !== id);
-      updateEquipmentTable();
-      Swal.fire("Deleted!", "The equipment has been deleted.", "success");
-    }
   });
+
+  if (confirmation.isConfirmed) {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.delete(
+        `http://localhost:8080/api/v1/equipments/${equipmentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.status === 204) {
+        Swal.fire("Deleted", "Equipment deleted successfully", "success");
+        fetchEquipmentFromBackend();
+      }
+    } catch (error) {
+      Swal.fire("Error", "An error occurred while deleting the equipment", "error");
+      console.error("Error:", error);
+    }
+  }
 }
 
-// Search Equipment
-function searchEquipment() {
-  const query = document.getElementById("searchEquipment").value.toLowerCase();
-  const rows = document.querySelectorAll("#equipmentTableBody tr");
+// Reset the form fields and editingEquipmentId
+function resetForm() {
+  editingEquipmentId = null;
+  document.getElementById("equipmentForm").reset();
+}
 
-  rows.forEach((row) => {
-    const id = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
-    const name = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
-    row.style.display =
-      id.includes(query) || name.includes(query) ? "" : "none";
+// Search Functionality
+function searchEquipment() {
+  const searchTerm = document.getElementById("searchEquipment").value.toLowerCase();
+  const filteredEquipment = equipmentList.filter(
+    (equipment) =>
+      equipment.name.toLowerCase().includes(searchTerm) ||
+      equipment.equipmentId.toLowerCase().includes(searchTerm)
+  );
+
+  const tableBody = document.getElementById("equipmentTableBody");
+  tableBody.innerHTML = "";
+  filteredEquipment.forEach((equipment) => {
+    const row = document.createElement("tr");
+    row.innerHTML = generateRowHTML(
+      equipment.equipmentId,
+      equipment.name,
+      equipment.type,
+      equipment.status,
+      equipment.staffIds || "N/A",
+      equipment.fieldIds || "N/A"
+    );
+    tableBody.appendChild(row);
   });
 }

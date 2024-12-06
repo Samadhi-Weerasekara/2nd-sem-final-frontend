@@ -1,168 +1,169 @@
 document.addEventListener("DOMContentLoaded", () => {
   fetchStaffFromBackend();
+
+  // Manage modal focus and background element tabindex
+  $('#staffModal').on('shown.bs.modal', function () {
+    $(this).find('button, [href], input, select, textarea').first().focus();
+    $('.background-elements').attr('tabindex', '-1');
+  });
+
+  $('#staffModal').on('hidden.bs.modal', function () {
+    $('.background-elements').removeAttr('tabindex');
+    resetForm();
+  });
 });
 
-// Sample data to simulate staff records (in a real app, this would come from a database)
+let editingStaffId = null; // Track the staff being edited
 let staffList = [];
 
-// Fetch staff data from the backend
-function fetchStaffFromBackend() {
-  fetch("http://localhost:8080/api/v1/staff/allstaff", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to fetch staff data");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      // Process the data and populate staffList
-      staffList = data.map((staff) => ({
-        id: staff.id,
-        firstName: staff.firstName,
-        lastName: staff.lastName,
-        designation: staff.designation,
-        gender: staff.gender,
-        joinedDate: staff.joinedDate,
-        email: staff.email,
-        mobilePhone: staff.contactNo,
-        address: `${staff.address.line1}, ${staff.address.line2}, ${staff.address.line3}, ${staff.address.line4}, ${staff.address.line5}`,
-        role: staff.role,
-      }));
+// Fetch staff from the backend
+async function fetchStaffFromBackend() {
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("No auth token found");
+    }
 
-      // Update the staff table with the fetched data
-      updateStaffTable();
-    })
-    .catch((error) => {
-      console.error("Error fetching staff data:", error);
+    const response = await axios.get("http://localhost:8080/api/v1/staff/allstaff", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
+
+    staffList = response.data.map((staff) => ({
+      id: staff.id,
+      firstName: staff.firstName,
+      lastName: staff.lastName,
+      designation: staff.designation,
+      gender: staff.gender,
+      joinedDate: staff.joinedDate,
+      dob: staff.dob,
+      email: staff.email,
+      contactNo: staff.contactNo,
+      address: `${staff.address.line1}, ${staff.address.line2}, ${staff.address.line3}, ${staff.address.line4}, ${staff.address.line5}`,
+      role: staff.role,
+    }));
+
+    initValues();
+  } catch (error) {
+    console.error("Error fetching staff data:", error);
+  }
 }
 
-// Function to generate HTML for a staff row
-function generateRowHTML(id, firstName, lastName, designation, gender, joinedDate, email, mobilePhone, address, role) {
+// Initialize table values
+function initValues() {
+  const tableBody = document.getElementById("staffTableBody");
+  tableBody.innerHTML = "";
+
+  staffList.forEach((staff) => {
+    const row = document.createElement("tr");
+    row.innerHTML = generateRowHTML(
+      staff.id,
+      `${staff.firstName} ${staff.lastName}`,
+      staff.designation,
+      staff.gender,
+      staff.joinedDate,
+      staff.dob,
+      staff.email,
+      staff.contactNo,
+      staff.address,
+      staff.role
+    );
+    tableBody.appendChild(row);
+  });
+}
+
+// Generate Table Row HTML
+function generateRowHTML(id, name, designation, gender, joinedDate, dob, email, contactNo, address, role) {
   return `
     <td>${id}</td>
-    <td>${firstName} ${lastName}</td>
+    <td>${name}</td>
     <td>${designation}</td>
     <td>${gender}</td>
     <td>${joinedDate}</td>
+    <td>${dob}</td>
     <td>${email}</td>
-    <td>${mobilePhone}</td>
+    <td>${contactNo}</td>
     <td>${address}</td>
+    <td>${role}</td>
     <td>
-        <div class="btn btn-sm" onclick="editStaff('${id}')"><i class="fa-solid fa-pen"></i></div>
-        <div class="btn btn-sm" onclick="deleteStaff('${id}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></div>
+      <button class="btn btn-sm" onclick="editStaff('${id}')"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn btn-sm" onclick="deleteStaff('${id}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></button>
     </td>
   `;
 }
 
-// Function to open the modal and reset the form for adding staff
-function openAddStaffModal() {
-  document.getElementById("staffForm").reset();
-  document.getElementById("staffId").value = ""; // Clear staff ID for new entry
-  document.getElementById("staffModalLabel").innerText = "Add Staff"; // Change modal title
-  new bootstrap.Modal(document.getElementById("staffModal")).show(); // Show the modal
-}
+// Add/Edit Staff Form Submit
+document.getElementById("staffForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-// Function to save staff data (add or edit)
-function saveStaff(event) {
-  event.preventDefault(); // Prevent form submission
+  const staffId = editingStaffId || `STAFF-${Date.now()}`;
+  const staffData = {
+    id: staffId,
+    firstName: document.getElementById("firstName").value,
+    lastName: document.getElementById("lastName").value,
+    designation: document.getElementById("designation").value,
+    gender: document.getElementById("gender").value,
+    joinedDate: document.getElementById("joinedDate").value,
+    dob: document.getElementById("dob").value,
+    email: document.getElementById("email").value,
+    contactNo: document.getElementById("contactNo").value,
+    address: {
+      line1: document.getElementById("addressLine1").value,
+      line2: document.getElementById("addressLine2").value,
+      line3: document.getElementById("addressLine3").value,
+      line4: document.getElementById("addressLine4").value,
+      line5: document.getElementById("addressLine5").value,
+    },
+    role: document.getElementById("role").value,
+  };
 
-  const staffId = document.getElementById("staffId").value;
-  const firstName = document.getElementById("firstName").value;
-  const lastName = document.getElementById("lastName").value;
-  const designation = document.getElementById("designation").value;
-  const gender = document.getElementById("gender").value;
-  const joinedDate = document.getElementById("joinedDate").value;
-  const email = document.getElementById("email").value;
-  const mobilePhone = document.getElementById("mobilePhone").value;
-  const addressLine1 = document.getElementById("addressLine1").value;
-  const addressLine2 = document.getElementById("addressLine2").value;
-  const addressLine3 = document.getElementById("addressLine3").value;
-  const addressLine4 = document.getElementById("addressLine4").value;
-  const addressLine5 = document.getElementById("addressLine5").value;
+  try {
+    const token = localStorage.getItem("authToken");
+    let response;
 
-  const fullAddress = `${addressLine1}, ${addressLine2}, ${addressLine3}, ${addressLine4}, ${addressLine5}`;
-
-  if (staffId) {
-    // Edit existing staff
-    const staffIndex = staffList.findIndex((staff) => staff.id === staffId);
-    if (staffIndex > -1) {
-      staffList[staffIndex] = {
-        id: staffId,
-        firstName,
-        lastName,
-        designation,
-        gender,
-        joinedDate,
-        email,
-        mobilePhone,
-        address: fullAddress,
-        role: document.getElementById("role").value,
-      };
+    if (editingStaffId) {
+      // Update existing staff
+      response = await axios.put(
+        `http://localhost:8080/api/v1/staff/${editingStaffId}`,
+        staffData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } else {
+      // Create new staff
+      response = await axios.post("http://localhost:8080/api/v1/staff", staffData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
     }
-  } else {
-    // Add new staff (backend should provide an ID for new entries)
-    const newStaff = {
-      id: staffList.length + 1, // Placeholder until backend responds
-      firstName,
-      lastName,
-      designation,
-      gender,
-      joinedDate,
-      email,
-      mobilePhone,
-      address: fullAddress,
-      role: document.getElementById("role").value,
-    };
-    staffList.push(newStaff);
+
+    Swal.fire("Success", "Staff data saved successfully", "success").then(() => {
+      fetchStaffFromBackend();
+      bootstrap.Modal.getInstance(document.getElementById("staffModal")).hide();
+    });
+  } catch (error) {
+    Swal.fire("Error", "An error occurred while saving staff data", "error");
+    console.error("Error:", error);
   }
+});
 
-  // Update the table and close the modal
-  updateStaffTable();
-  new bootstrap.Modal(document.getElementById("staffModal")).hide();
-}
-
-// Function to update the staff table with the current staffList
-function updateStaffTable() {
-  const staffTableBody = document.getElementById("staffTableBody");
-  staffTableBody.innerHTML = ""; // Clear existing rows
-
-  staffList.forEach((staff) => {
-    const rowHTML = generateRowHTML(
-      staff.id,
-      staff.firstName,
-      staff.lastName,
-      staff.designation,
-      staff.gender,
-      staff.joinedDate,
-      staff.email,
-      staff.mobilePhone,
-      staff.address,
-      staff.role
-    );
-    const row = document.createElement("tr");
-    row.innerHTML = rowHTML;
-    staffTableBody.appendChild(row);
-  });
-}
-
-// Function to edit a staff member
+// Edit Staff
 function editStaff(id) {
-  const staff = staffList.find((staff) => staff.id === id);
+  const staff = staffList.find((item) => item.id === id);
   if (staff) {
-    document.getElementById("staffId").value = staff.id;
     document.getElementById("firstName").value = staff.firstName;
     document.getElementById("lastName").value = staff.lastName;
     document.getElementById("designation").value = staff.designation;
     document.getElementById("gender").value = staff.gender;
     document.getElementById("joinedDate").value = staff.joinedDate;
+    document.getElementById("dob").value = staff.dob;
     document.getElementById("email").value = staff.email;
-    document.getElementById("mobilePhone").value = staff.mobilePhone;
+    document.getElementById("contactNo").value = staff.contactNo;
 
     const addressParts = staff.address.split(", ");
     document.getElementById("addressLine1").value = addressParts[0] || "";
@@ -171,68 +172,78 @@ function editStaff(id) {
     document.getElementById("addressLine4").value = addressParts[3] || "";
     document.getElementById("addressLine5").value = addressParts[4] || "";
 
-    document.getElementById("staffModalLabel").innerText = "Edit Staff"; // Change modal title
-    openAddStaffModal(); // Open the modal
+    document.getElementById("role").value = staff.role;
+
+    editingStaffId = id;
+    document.getElementById("staffModalLabel").textContent = "Edit Staff";
+    const staffModal = new bootstrap.Modal(document.getElementById("staffModal"));
+    staffModal.show();
   }
 }
 
-// Function to delete a staff member
-function deleteStaff(id) {
-  // Show SweetAlert confirmation dialog
-  Swal.fire({
-    title: "Are you sure?", // Confirmation title
-    text: "Do you really want to delete this staff?", // Confirmation message
-    icon: "warning", // Warning icon
-    showCancelButton: true, // Show "Cancel" button
-    confirmButtonText: "Yes, delete it!", // Text for the confirmation button
-    cancelButtonText: "Cancel", // Text for the cancel button
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Remove staff member from the list
-      staffList = staffList.filter((staff) => staff.id !== id);
-
-      // Update the staff table
-      updateStaffTable();
-
-      // Display success message
-      Swal.fire("Deleted!", "The staff has been deleted.", "success");
-    }
+// Delete Staff
+async function deleteStaff(id) {
+  const confirmation = await Swal.fire({
+    title: "Are you sure?",
+    text: "This will delete the staff permanently!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it!",
   });
+
+  if (confirmation.isConfirmed) {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.delete(
+        `http://localhost:8080/api/v1/staff/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.status === 204) {
+        Swal.fire("Deleted", "Staff deleted successfully", "success");
+        fetchStaffFromBackend();
+      }
+    } catch (error) {
+      Swal.fire("Error", "An error occurred while deleting the staff", "error");
+      console.error("Error:", error);
+    }
+  }
 }
 
-// Function to search for staff by name
+// Reset the form fields and editingStaffId
+function resetForm() {
+  editingStaffId = null;
+  document.getElementById("staffForm").reset();
+}
+
+// Search Staff
 function searchStaff() {
-  const query = document.getElementById("searchStaff").value.toLowerCase();
-  const filteredStaff = staffList.filter((staff) => {
-    return `${staff.firstName} ${staff.lastName}`.toLowerCase().includes(query);
-  });
+  const searchTerm = document.getElementById("searchStaff").value.toLowerCase();
+  const filteredStaff = staffList.filter(
+    (staff) =>
+      staff.firstName.toLowerCase().includes(searchTerm) ||
+      staff.lastName.toLowerCase().includes(searchTerm)
+  );
 
-  // Update the table with filtered results
-  const staffTableBody = document.getElementById("staffTableBody");
-  staffTableBody.innerHTML = ""; // Clear existing rows
-
+  const tableBody = document.getElementById("staffTableBody");
+  tableBody.innerHTML = ""; // Clear the table
   filteredStaff.forEach((staff) => {
-    const rowHTML = generateRowHTML(
+    const row = document.createElement("tr");
+    row.innerHTML = generateRowHTML(
       staff.id,
-      staff.firstName,
-      staff.lastName,
+      `${staff.firstName} ${staff.lastName}`,
       staff.designation,
       staff.gender,
       staff.joinedDate,
+      staff.dob,
       staff.email,
-      staff.mobilePhone,
+      staff.contactNo,
       staff.address,
       staff.role
     );
-    const row = document.createElement("tr");
-    row.innerHTML = rowHTML;
-    staffTableBody.appendChild(row);
+    tableBody.appendChild(row);
   });
 }
-
-// Event listener for form submission
-document.getElementById("staffForm").addEventListener("submit", saveStaff);
-
-// Initial population of the staff table
-// No longer needed since the table is updated after fetching data
-// updateStaffTable();

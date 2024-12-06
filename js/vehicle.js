@@ -1,81 +1,85 @@
 document.addEventListener("DOMContentLoaded", () => {
   fetchVehiclesFromBackend();
+
+  // Manage modal focus and background element tabindex
+  $('#vehicleModal').on('shown.bs.modal', function () {
+    $(this).find('button, [href], input, select, textarea').first().focus();
+    $('.background-elements').attr('tabindex', '-1');
+  });
+
+  $('#vehicleModal').on('hidden.bs.modal', function () {
+    $('.background-elements').removeAttr('tabindex');
+    resetForm();
+  });
 });
 
-
-// Sample data for testing
+let currentVehicleId = null; // Track the vehicle being edited
 let vehicles = [];
-let currentVehicleId = null; // Declare this at the top
 
-
-// Function to fetch vehicle data from the backend
-// Function to fetch vehicle data from the backend
-function fetchVehiclesFromBackend() {
-  fetch("http://localhost:8080/api/v1/vehicles/allvehicles", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to fetch vehicles");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      vehicles = data.map((vehicle) => ({
-        id: vehicle.vehicleCode, // Use vehicleCode as the unique ID
-        licensePlate: vehicle.licensePlateNumber.trim(),
-        category: vehicle.vehicleCategory.trim(),
-        fuelType: vehicle.fuelType,
-        status: vehicle.status,
-        assignedStaff: vehicle.staffId,
-        remarks: vehicle.remarks, // Use staffId or fall back to remarks
-      }));
-
-      console.log("Vehicles fetched successfully:", vehicles);
-      loadVehicles(); // Load vehicles after fetching
-    })
-    .catch((error) => {
-      console.error("Error fetching vehicles:", error);
+// Fetch vehicles from the backend
+async function fetchVehiclesFromBackend() {
+  try {
+    const response = await fetch("http://localhost:8080/api/v1/vehicles/allvehicles", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch vehicles");
+    }
+
+    const data = await response.json();
+    vehicles = data.map(vehicle => ({
+      id: vehicle.vehicleCode,
+      licensePlate: vehicle.licensePlateNumber.trim(),
+      category: vehicle.vehicleCategory.trim(),
+      fuelType: vehicle.fuelType,
+      status: vehicle.status,
+      assignedStaff: vehicle.staffId,
+      remarks: vehicle.remarks,
+    }));
+
+    console.log("Vehicles fetched successfully:", vehicles);
+    initValues(); // Load vehicles into the table after fetching
+  } catch (error) {
+    console.error("Error fetching vehicles:", error);
+  }
 }
 
-// Load vehicles into the table
-function loadVehicles(filter = "") {
+// Initialize vehicle table values
+function initValues() {
   const vehicleTableBody = document.getElementById("vehicleTableBody");
   vehicleTableBody.innerHTML = "";
 
-  vehicles
-    .filter((vehicle) =>
-      vehicle.licensePlate.toLowerCase().includes(filter.toLowerCase())
-    )
-    .forEach((vehicle) => {
-      const row = `
-        <tr data-id="${vehicle.id}">
-          <td>${vehicle.id}</td>
-          <td>${vehicle.licensePlate}</td>
-          <td>${vehicle.category}</td>
-          <td>${vehicle.fuelType}</td>
-          <td>${vehicle.status}</td>
-          <td>${vehicle.assignedStaff}</td>
-          <td>${vehicle.remarks}</td>
-          
-          <td>
-            <button class="btn btn-sm" onclick="editVehicle('${vehicle.id}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm" onclick="deleteVehicle('${vehicle.id}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></button>
-          </td>
-        </tr>
-      `;
-      vehicleTableBody.innerHTML += row;
-    });
+  vehicles.forEach(vehicle => {
+    const row = document.createElement("tr");
+    row.innerHTML = generateRowHTML(vehicle);
+    vehicleTableBody.appendChild(row);
+  });
 }
 
-// Handle Save/Update vehicle
-const vehicleForm = document.getElementById("vehicleForm");
-vehicleForm.addEventListener("submit", function (e) {
-  e.preventDefault();
+// Generate Table Row HTML
+function generateRowHTML(vehicle) {
+  return `
+    <td>${vehicle.id}</td>
+    <td>${vehicle.licensePlate}</td>
+    <td>${vehicle.category}</td>
+    <td>${vehicle.fuelType}</td>
+    <td>${vehicle.status}</td>
+    <td>${vehicle.assignedStaff || 'N/A'}</td>
+    <td>${vehicle.remarks || 'N/A'}</td>
+    <td>
+      <button class="btn btn-sm" onclick="editVehicle('${vehicle.id}')"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn btn-sm" onclick="deleteVehicle('${vehicle.id}')"><i class="fa-solid fa-trash" style="color: #e9542f;"></i></button>
+    </td>
+  `;
+}
+
+// Add/Edit Vehicle Form Submit
+document.getElementById("vehicleForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
 
   const licensePlate = document.getElementById("licensePlate").value;
   const category = document.getElementById("vehicleCategory").value;
@@ -84,77 +88,128 @@ vehicleForm.addEventListener("submit", function (e) {
   const assignedStaff = document.getElementById("assignedStaff").value;
   const remarks = document.getElementById("remarks").value;
 
-  if (currentVehicleId) {
-    // Update existing vehicle
-    const vehicle = vehicles.find((v) => v.id === currentVehicleId);
-    if (vehicle) {
-      vehicle.licensePlate = licensePlate;
-      vehicle.category = category;
-      vehicle.fuelType = fuelType;
-      vehicle.status = status;
-      vehicle.assignedStaff = assignedStaff;
-      vehicle.remarks = remarks;
-    }
-  } else {
-    // Add new vehicle
-    vehicles.push({
-      id: vehicles.length ? Math.max(...vehicles.map((v) => v.id)) + 1 : 1, // Incrementing ID
-      licensePlate,
-      category,
-      fuelType,
-      status,
-      assignedStaff,
-      remarks,
-    });
-  }
+  try {
+    let response;
+    const vehicleData = {
+      vehicleCode: currentVehicleId || `VEHICLE-${Date.now()}`,
+      licensePlateNumber: licensePlate,
+      vehicleCategory: category,
+      fuelType: fuelType,
+      status: status,
+      staffId: assignedStaff || null,
+      remarks: remarks,
+    };
 
-  currentVehicleId = null; // Reset ID after save/update
-  vehicleForm.reset();
-  vehicleModal.hide();
-  loadVehicles();
+    if (currentVehicleId) {
+      // Update existing vehicle
+      response = await fetch(`http://localhost:8080/api/v1/vehicles/${currentVehicleId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(vehicleData),
+      });
+    } else {
+      // Create new vehicle
+      response = await fetch("http://localhost:8080/api/v1/vehicles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(vehicleData),
+      });
+    }
+
+    if (response.ok) {
+      Swal.fire({
+        title: "Success",
+        text: `Vehicle ${currentVehicleId ? 'updated' : 'created'} successfully`,
+        icon: "success",
+        confirmButtonText: "OK",
+      }).then(() => {
+        fetchVehiclesFromBackend(); // Refresh the table
+        bootstrap.Modal.getInstance(document.getElementById("vehicleModal")).hide(); // Close the modal
+      });
+    } else {
+      throw new Error('Failed to save vehicle');
+    }
+  } catch (error) {
+    Swal.fire("Error", error.message, "error");
+    console.error("Error:", error);
+  }
 });
 
-// Populate modal with vehicle details for editing
+// Edit Vehicle
 function editVehicle(id) {
-  document.getElementById("vehicleModalLabel").innerText = "Edit Vehicle";
-  currentVehicleId = id;
-  const vehicle = vehicles.find((v) => v.id === id);
+  const vehicle = vehicles.find(v => v.id === id);
   if (vehicle) {
-    currentVehicleId = id;
     document.getElementById("licensePlate").value = vehicle.licensePlate;
     document.getElementById("vehicleCategory").value = vehicle.category;
     document.getElementById("fuelType").value = vehicle.fuelType;
     document.getElementById("status").value = vehicle.status;
-    document.getElementById("assignedStaff").value = vehicle.assignedStaff;
-    document.getElementById("remarks").value = vehicle.remarks;
+    document.getElementById("assignedStaff").value = vehicle.assignedStaff || '';
+    document.getElementById("remarks").value = vehicle.remarks || '';
 
-    bootstrap.Modal.getOrCreateInstance(
-      document.getElementById("vehicleModal")
-    ).show();
-   
+    currentVehicleId = id;
+    document.getElementById("vehicleModalLabel").textContent = "Edit Vehicle";
+    bootstrap.Modal.getInstance(document.getElementById("vehicleModal")).show();
+  } else {
+    console.error("Vehicle with ID", id, "not found.");
   }
 }
 
-// Delete vehicle with confirmation
-function deleteVehicle(id) {
-  Swal.fire({
+// Delete Vehicle
+async function deleteVehicle(id) {
+  const confirmation = await Swal.fire({
     title: "Are you sure?",
-    text: "Do you really want to delete this vehicle?",
+    text: "This will delete the vehicle permanently!",
     icon: "warning",
     showCancelButton: true,
     confirmButtonText: "Yes, delete it!",
-    cancelButtonText: "Cancel",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      vehicles = vehicles.filter((v) => v.id !== id);
-      loadVehicles();
-      Swal.fire("Deleted!", "The vehicle has been deleted.", "success");
-    }
   });
+
+  if (confirmation.isConfirmed) {
+    try {
+      const response = await fetch(`http://localhost:8080/api/v1/vehicles/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        Swal.fire("Deleted", "Vehicle deleted successfully", "success");
+        fetchVehiclesFromBackend(); // Refresh the vehicle list
+      } else {
+        throw new Error("Failed to delete vehicle");
+      }
+    } catch (error) {
+      Swal.fire("Error", error.message, "error");
+      console.error("Error:", error);
+    }
+  }
 }
 
-// Search vehicles
-const searchInput = document.getElementById("searchVehicle");
-searchInput.addEventListener("input", function () {
-  loadVehicles(this.value);
+// Reset form fields
+function resetForm() {
+  currentVehicleId = null;
+  document.getElementById("vehicleForm").reset();
+}
+
+// Search Vehicles
+document.getElementById("searchVehicle").addEventListener("input", function () {
+  const searchTerm = this.value.toLowerCase();
+  const filteredVehicles = vehicles.filter(vehicle =>
+    vehicle.licensePlate.toLowerCase().includes(searchTerm) ||
+    vehicle.category.toLowerCase().includes(searchTerm)
+  );
+
+  const vehicleTableBody = document.getElementById("vehicleTableBody");
+  vehicleTableBody.innerHTML = ""; // Clear existing rows
+
+  filteredVehicles.forEach(vehicle => {
+    const row = document.createElement("tr");
+    row.innerHTML = generateRowHTML(vehicle);
+    vehicleTableBody.appendChild(row);
+  });
 });
