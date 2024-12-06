@@ -2,6 +2,11 @@
 body {
   font-family: "Kanit", sans-serif;
 }
+#map {
+  height: 400px; /* Set height for the map */
+  width: 100%; /* Optional: Set width to full */
+  margin-bottom: 20px;
+}
 
 /* Main Content */
 .main-content {

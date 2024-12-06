@@ -21,6 +21,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   </head>
   <body>
     <!-- Main Content -->
@@ -54,27 +55,27 @@
 
         <section class="live-location">
           <h3>Live Location</h3>
-          <div class="map">
-            <!-- Embed a map here -->
-            <p>Map Placeholder</p>
-          </div>
+          <div id="map" style="height: 400px;"></div> <!-- Specify height -->
         </section>
+        
 
         <section class="weather-tasks">
           <div class="weather">
-            <h3>Weather Info</h3>
+            <!-- <h3>Weather Info</h3>
             <p>Temperature: 26°C</p>
-            <p>Cloudy</p>
+            <p>Cloudy</p> -->
           </div>
           <div class="tasks">
             <h3>Tasks</h3>
             <ul>
-              <li>Visit Field A - 9:00 AM</li>
-              <li>Inspect Crop B - 10:30 AM</li>
+              <!-- <li>Visit Field A - 9:00 AM</li>
+              <li>Inspect Crop B - 10:30 AM</li> -->
             </ul>
           </div>
         </section>
       </div>
     </div>
+    <script src="/js/dashboard.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   </body>
 </html>
